@@ -32,6 +32,15 @@
 
     <!-- Бічне меню -->
 <!-- ПОВНЕ МЕНЮ З ЧАТОМ, АНЕКДОТАМИ ТА ГОРОСКОПОМ -->
+    function toggleMenu() {
+    const menu = document.getElementById('sideMenu');
+    if (menu.style.left === '0px') {
+        menu.style.left = '-100%';
+    } else {
+        menu.style.left = '0px';
+    }
+}
+
 <div id="sideMenu" class="side-menu" style="position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: #111; z-index: 2000; transition: 0.4s; padding: 20px; box-sizing: border-box; overflow-y: auto; color: white; font-family: sans-serif;">
     
     <!-- Кнопка закриття -->
@@ -347,6 +356,15 @@ window.onload = () => {
 };
 </script>
 
+function toggleMenu() {
+    const menu = document.getElementById('sideMenu');
+    // Перевіряємо поточне положення. Якщо воно не 0px — висуваємо.
+    if (menu.style.left === '0px') {
+        menu.style.left = '-100%';
+    } else {
+        menu.style.left = '0px';
+    }
+}
 
 </body>
 </html>
