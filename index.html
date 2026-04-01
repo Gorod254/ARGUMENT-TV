@@ -90,14 +90,137 @@
     <footer class="main-footer">
         <p>Аргумент TV є агрегатором новин. Весь аудіовізуальний контент належить законним особам ТОВ «Віжн ФМ» та Національна Суспільна Телерадіокомпанія України. 2026 рік</p>
     </footer>
+<script>
+// --- 1. ГОДИННИК ---
+function updateClock() {
+    const el = document.getElementById('digital-clock');
+    if(el) el.textContent = new Date().toLocaleTimeString('uk-UA', { hour12: false });
+}
+setInterval(updateClock, 1000);
 
-    <script>
-    // Тимчасовий тест прямо в HTML
-    alert("Тепер я точно працюю!");
+// --- 2. ВАЛЮТИ НБУ ---
+async function fetchCurrency() {
+    try {
+        const resp = await fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json');
+        const data = await resp.json();
+        const codes = ['USD', 'EUR', 'GBP', 'PLN', 'MDL'];
+        let text = "Курс НБУ: ";
+        data.filter(i => codes.includes(i.cc)).forEach(i => {
+            text += `${i.cc}: ${i.rate.toFixed(2)} | `;
+        });
+        document.querySelector('.currency-bar marquee').textContent = text;
+    } catch(e) { console.error("Currency error"); }
+}
+
+// --- 3. ПОГОДА ---
+const weatherCoords = {
+    "Balta": {lat: 47.93, lon: 29.62}, "Podilsk": {lat: 47.74, lon: 29.53},
+    "Kodyma": {lat: 48.09, lon: 29.12}, "Ananiv": {lat: 47.72, lon: 29.96},
+    "Liubashivka": {lat: 47.83, lon: 30.25}, "Savran": {lat: 48.13, lon: 30.08},
+    "Pishchana": {lat: 48.20, lon: 29.75}, "Zelenogirske": {lat: 47.84, lon: 30.22},
+    "Slobidka": {lat: 47.88, lon: 29.35}, "Okny": {lat: 47.53, lon: 29.46}
+};
+
+async function updateWeather(city) {
+    const c = weatherCoords[city];
+    try {
+        const resp = await fetch(`https://www.7timer.info/bin/api.pl?lon=${c.lon}&lat=${c.lat}&product=civil&output=json`);
+        const data = await resp.json();
+        const cur = data.dataseries[0];
+        document.querySelector('.temp').textContent = `${cur.temp2m}°C`;
+        const states = { "clearday": "Ясно", "pcloudy": "Мінлива хмарність", "mcloudy": "Хмарно", "cloudy": "Пасмурно", "rain": "Дощ", "snow": "Сніг" };
+        document.querySelector('.desc').textContent = states[cur.weather] || cur.weather;
+    } catch(e) { document.querySelector('.desc').textContent = "Помилка"; }
+}
+
+// --- 4. НОВИНИ (АРХІВ 8 ГОДИН) ---
+async function fetchNews() {
+    const container = document.getElementById('news-container');
+    const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
+    const sources = {
+        "УП": "https://www.pravda.com.ua/rss/",
+        "Громадське": "https://hromadske.ua/rss",
+        "Суспільне": "https://suspilne.media/rss/99.rss",
+        "Думська": "https://dumskaya.net/rssnews.xml",
+        "24 Канал": "https://24tv.ua/rss/allNews.xml",
+        "Південь Сьогодні": "https://yug.today/feed/"
+    };
+
+    let allNews = [];
+    for (let [name, url] of Object.entries(sources)) {
+        try {
+            const resp = await fetch(proxy + encodeURIComponent(url));
+            const data = await resp.json();
+            if (data.items) {
+                data.items.forEach(item => {
+                    allNews.push({
+                        title: item.title, link: item.link,
+                        time: new Date(item.pubDate.replace(/-/g, "/")), source: name
+                    });
+                });
+            }
+        } catch (e) { console.log(name + " error"); }
+    }
+
+    allNews.sort((a, b) => b.time - a.time);
+    const limit = new Date(Date.now() - 8 * 60 * 60 * 1000);
+    const filtered = allNews.filter(n => n.time > limit);
+
+    container.innerHTML = filtered.map(n => `
+        <a href="${n.link}" target="_blank" class="news-item" style="display:block; padding:10px; border-bottom:1px solid #222; text-decoration:none; color:white;">
+            <div style="font-size:0.8rem; color:#e30613;">${n.source} | ${n.time.getHours()}:${String(n.time.getMinutes()).padStart(2, '0')}</div>
+            <div style="font-weight:bold; margin-top:5px;">${n.title}</div>
+        </a>
+    `).join('');
+}
+
+// --- 5. ІНІЦІАЛІЗАЦІЯ ---
+window.onload = () => {
+    // Відео
+    const v = document.getElementById('video');
+    const src = 'https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8';
+    if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(src);
+        hls.attachMedia(v);
+    } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
+        v.src = src;
+    }
+
+    // Радіо
+    const r = document.getElementById('radio-player');
+    const btn = document.getElementById('playRadio');
+    btn.onclick = () => {
+        if (r.paused) { r.play(); btn.textContent = "STOP"; }
+        else { r.pause(); btn.textContent = "PLAY"; }
+    };
+
+    // Інше
+    updateClock();
+    fetchCurrency();
+    fetchNews();
+    updateWeather("Balta");
+    setInterval(fetchNews, 300000);
+
+    // Бургер
+    document.getElementById('menuBtn').onclick = () => document.getElementById('sideMenu').classList.toggle('active');
     
-    // Сюди можна вставити весь код зі script.js пізніше, 
-    // якщо окремий файл так і не захоче підключатися.
+    // Анекдоти
+    document.getElementById('jokeBtn').onclick = (e) => {
+        e.preventDefault();
+        const jokes = [
+            "Новини: Сьогодні було так сонячно, що погода в смартфоні заплющила очі.",
+            "Балта: Знайшли гаманець. Господарю прохання не турбувати, ми купили радіо!",
+            "Аргумент TV: Ми знаємо новини раніше, ніж вони стаються."
+        ];
+        document.getElementById('joke-display').innerHTML = `<p style="padding:10px; color:white; border-left:3px solid red;">${jokes[Math.floor(Math.random()*jokes.length)]}</p>`;
+    };
+
+    // Місто
+    document.getElementById('city-select').onchange = (e) => updateWeather(e.target.value);
+};
 </script>
+
 
 </body>
 </html>
