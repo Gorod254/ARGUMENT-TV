@@ -31,19 +31,91 @@
     </header>
 
     <!-- Бічне меню -->
-    <div id="sideMenu" class="side-menu">
-    <a href="#" onclick="toggleMenu()">✖ Закрити меню</a>
-    <a href="#">🎭 Анекдот дня</a>
-    <a href="#">🏛 Офіційні новини Балтської ОТГ</a>
+<!-- ПОВНЕ МЕНЮ З ЧАТОМ, АНЕКДОТАМИ ТА ГОРОСКОПОМ -->
+<div id="sideMenu" class="side-menu" style="position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: #111; z-index: 2000; transition: 0.4s; padding: 20px; box-sizing: border-box; overflow-y: auto; color: white; font-family: sans-serif;">
     
-    <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
-    
-    <h4 style="color: #e30613; text-align: center; font-size: 0.9rem; margin-bottom: 10px;">ЧАТ ГРОМАДИ</h4>
-    
-    <div style="width: 100%; height: 400px; background: #000; overflow: hidden;">
+    <!-- Кнопка закриття -->
+    <a href="javascript:void(0)" onclick="toggleMenu()" style="color: #e30613; text-decoration: none; font-weight: bold; display: block; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">✖ ЗАКРИТИ МЕНЮ</a>
+
+    <!-- Соцмережі -->
+    <a href="https://www.facebook.com/groups/balta.city" target="_blank" style="color: white; text-decoration: none; display: block; margin-bottom: 15px; font-size: 0.9rem;">🌐 Наш Facebook (Балта)</a>
+    <a href="https://balta-otg.gov.ua/" target="_blank" style="color: white; text-decoration: none; display: block; margin-bottom: 15px; font-size: 0.9rem;">🏛 Новини Балтської ОТГ</a>
+
+    <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
+
+    <!-- РОЗВАГИ: АНЕКДОТИ -->
+    <button onclick="showBaltyJoke()" style="width: 100%; padding: 10px; background: #e30613; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 15px;">🎭 АНЕКДОТ ДНЯ</button>
+
+    <!-- РОЗВАГИ: ГОРОСКОП -->
+    <div style="background: #222; padding: 15px; border-radius: 8px; border-left: 3px solid #e30613; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 10px 0; font-size: 0.8rem; color: #e30613; text-transform: uppercase;">🔮 Гороскоп Балтський</h4>
+        <select id="zodiac" onchange="runHoroscope()" style="width: 100%; padding: 8px; background: #000; color: white; border: 1px solid #444; border-radius: 5px;">
+            <option value="">Обери свій знак...</option>
+            <option value="Овен">Овен ♈</option>
+            <option value="Телець">Телець ♉</option>
+            <option value="Близнюки">Близнюки ♊</option>
+            <option value="Рак">Рак ♋</option>
+            <option value="Лев">Лев ♌</option>
+            <option value="Діва">Діва ♍</option>
+            <option value="Терези">Терези ♎</option>
+            <option value="Скорпіон">Скорпіон ♏</option>
+            <option value="Стрілець">Стрілець ♐</option>
+            <option value="Козеріг">Козеріг ♑</option>
+            <option value="Водолій">Водолій ♒</option>
+            <option value="Риби">Риби ♓</option>
+        </select>
+        <p id="h-text" style="font-size: 0.75rem; color: #ccc; margin-top: 10px; line-height: 1.4;"></p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
+
+    <!-- ЧАТ -->
+    <h4 style="color: #e30613; font-size: 0.8rem; text-align: center; margin-bottom: 10px;">ЧАТ ГРОМАДИ</h4>
+    <div style="width: 100%; height: 350px; background: #000; border: 1px solid #333; border-radius: 5px; overflow: hidden;">
         <iframe src="https://argument-tv.chatango.com" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
     </div>
+
+    <!-- СКРИПТИ ЛОГІКИ (Тільки для меню) -->
+    <script>
+        function showBaltyJoke() {
+            const jokes = [
+                "У Балті на ринку: — Жіночко, чого ваша ковбаса така дорога? — Бо вона з Подільська пішки йшла!",
+                "Новини Аргумент TV: В Балті зафіксовано аномалію — людина пройшла повз 'Копійку' і нічого не купила.",
+                "— Куме, а де в Балті найкращий інтернет? — На пошті, там коли черга стоїть, швидкість передачі пліток 5G!",
+                "Балтський джентльмен — це той, хто виходячи з електрички, притримує двері куму з двома мішками картоплі.",
+                "Оголошення: Вивезу сміття. Дорого. Красиво. З музикою Аргумент TV.",
+                "У Балтській мерії: — Чому в нас дороги такі криві? — Щоб ворог не доїхав до вокзалу!",
+                "— Чому балтські коти найтовстіші в області? — Бо вони під'їдають за тими, хто не доїв шаурму на площі.",
+                "Зустрілися двоє в Балті: — Ти де зараз працюєш? — На Аргумент TV. — О, то ти тепер знаєш, коли в нас воду вимкнуть?",
+                "Прикмета: Якщо на балтському ринку тихо — значить, сьогодні понеділок.",
+                "— Тату, я хочу бути космонавтом! — Ні, синку, будеш таксистом у Балті, там ями такі ж, як кратери на Місяці.",
+                "Балтська дієта: вранці — кава з видом на собор, ввечері — насіння біля будинку.",
+                "— Куме, а що то за черга на площі? — Та то люди чекають, поки Аргумент TV анекдоти оновить!",
+                "Тільки в Балті можна почути: — Я за вами в черзі стояв ще коли долар був по вісім!",
+                "— Жіночко, а ваші яблука точно з Балти? — А що, ви паспорт у них хочете перевірити?",
+                "Коли в Балті випадає сніг, таксисти автоматично стають пілотами всюдиходів."
+            ];
+            alert(jokes[Math.floor(Math.random() * jokes.length)]);
+        }
+
+        function runHoroscope() {
+            const s = document.getElementById('zodiac').value;
+            const t = document.getElementById('h-text');
+            if(!s) { t.innerText = ""; return; }
+            const p = [
+                "Сьогодні в Балті на вас чекає приємна зустріч біля фонтану.",
+                "Вдалий день для покупок на ринку. Торгуйтеся до останнього!",
+                "Зірки радять сьогодні подивитися Аргумент TV у колі друзів.",
+                "Будьте обережні на дорогах, особливо біля переїзду.",
+                "Вечір принесе гарні новини від родичів з Подільська.",
+                "Фінансовий успіх чекає на тих, хто не витрачає все в 'Копійці'.",
+                "Чудовий день для прогулянки вздовж Кодими."
+            ];
+            t.innerHTML = "<strong>" + s + ":</strong> " + p[Math.floor(Math.random() * p.length)];
+        }
+    </script>
 </div>
+
 
         <!-- Відеоплеєр -->
         <section class="video-section">
