@@ -36,32 +36,26 @@
             <li><a href="#" id="jokeBtn">🎭 Анекдот дня</a></li>
             <li><a href="https://www.facebook.com/share/g/18Eok1LxGM/" target="_blank">🏛 Офіційні новини Балтської ОТГ</a></li>
         </ul>
-        <div id="joke-display" <!-- Живий Чат Аргумент TV -->
-<div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
-    <h4 style="color: #e30613; font-size: 0.9rem; margin-bottom: 10px; text-align: center;">ЧАТ ГРОМАДИ</h4>
-    <div id="chat-container" style="width: 100%; height: 300px; background: #000;">
-        <script id="cid0020000373465355428" data-cfasync="false" async src="//st.chatango.com/js/gz/emb.js" style="width: 100%;height: 100%;">
+        <div id="joke-display"<!-- Розділ чату в меню -->
+<div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; position: relative;">
+    <h4 style="color: #e30613; font-size: 0.9rem; margin-bottom: 10px; text-align: center; text-transform: uppercase;">
+        Чат громади
+    </h4>
+    
+    <div id="chat-wrapper" style="width: 100%; height: 350px; background: #000; overflow: hidden;">
+        <script id="cid0020000373465355428" data-cfasync="false" async src="//st.chatango.com/js/gz/emb.js" style="width: 100%; height: 100%;">
         {
             "handle":"argument-tv",
             "arch":"js",
             "styles":{
-                "a":"111111", // Колір фону (чорний)
-                "b":100,      // Прозорість
-                "c":"FFFFFF", // Колір тексту (білий)
-                "d":"FFFFFF", // Колір посилань
-                "k":"e30613", // Колір кнопок (червоний Аргумент)
-                "l":"e30613", // Колір панелі
-                "m":"e30613", // Колір заголовка
-                "n":"FFFFFF", // Колір тексту в заголовку
-                "q":"e30613", // Колір курсора
-                "r":100       // Скруглення
+                "a":"111111","b":100,"c":"FFFFFF","d":"FFFFFF",
+                "k":"e30613","l":"e30613","m":"e30613","n":"FFFFFF",
+                "q":"e30613","r":100
             }
         }
         </script>
     </div>
 </div>
- class="joke-box"></div>
-    </nav>
 
     <main class="content">
         <!-- Відеоплеєр -->
@@ -75,9 +69,9 @@
     <div style="color: white; font-size: 0.8rem; margin: 5px 0; text-align: center; font-weight: bold;">
         ОПЕРАТИВНА КАРТА ТРИВОГ
     </div>
-    <div style="width: 100%; height: 150px; overflow: hidden; border-radius: 4px;">
+    <div style="width: 100%; height: 250px; overflow: hidden; border-radius: 4px;">
         <iframe 
-            src="https://alerts.in.ua/widgets/map?menu=false&net=false&is=false&style=v2" 
+            src="https://alerts.in.ua/widgets/map" 
             width="100%" 
             height="100%" 
             frameborder="0" 
