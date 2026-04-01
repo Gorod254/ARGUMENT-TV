@@ -1,3 +1,4 @@
+alert("Сайт працює!");
 // --- КОНФІГУРАЦІЯ ---
 const RSS_SOURCES = {
     "УП": "https://www.pravda.com.ua/rss/",
