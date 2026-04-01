@@ -2,369 +2,132 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Аргумент TV — Новинний Агрегатор</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Підключаємо шрифт схожий на логотип -->
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Бібліотека для m3u8 відео -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аргумент TV - Балта</title>
+    <style>
+        body { background-color: #000; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        header { background-color: #000; padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #e30613; position: sticky; top: 0; z-index: 1000; }
+        .logo-area { display: flex; flex-direction: column; }
+        .logo-main { font-size: 24px; font-weight: bold; color: #fff; text-decoration: none; }
+        .logo-red { color: #e30613; }
+        .burger { font-size: 30px; cursor: pointer; color: #fff; background: none; border: none; }
+        
+        /* Бічне меню */
+        .side-menu { position: fixed; top: 0; left: -100%; width: 300px; height: 100%; background: #111; z-index: 2000; transition: 0.4s; padding: 20px; box-sizing: border-box; overflow-y: auto; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+        .side-menu.active { left: 0; }
+        .side-menu a { color: white; text-decoration: none; display: block; padding: 12px 0; border-bottom: 1px solid #222; font-size: 1rem; }
+        .side-menu button { width: 100%; padding: 12px; background: #e30613; color: white; border: none; border-radius: 5px; margin-top: 15px; font-weight: bold; cursor: pointer; }
+        
+        .container { padding: 10px; max-width: 800px; margin: 0 auto; }
+        .video-container { width: 100%; aspect-ratio: 16/9; background: #111; margin-bottom: 15px; border-radius: 8px; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        .info-bar { background: #111; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 0.9rem; border-left: 4px solid #e30613; }
+        .section-title { color: #e30613; text-transform: uppercase; font-size: 0.9rem; font-weight: bold; margin-bottom: 10px; display: block; text-align: center; }
+    </style>
 </head>
 <body>
 
-    <!-- Шапка сайту -->
-    <header class="main-header">
-        <div class="header-top">
-            <button class="burger-menu" id="menuBtn">
-                <span></span><span></span><span></span>
-            </button>
-            <img src="logo.png" alt="Аргумент TV" class="main-logo">
-            <div id="digital-clock" class="clock">00:00:00</div>
-        </div>
-        
-        <!-- Курс валют -->
-        <div class="currency-bar">
-            <marquee behavior="scroll" direction="left">
-                НБУ: USD: --.-- | EUR: --.-- | GBP: --.-- | PLN: --.-- | MDL: --.--
-            </marquee>
-        </div>
-    </header>
+<header>
+    <button class="burger" onclick="toggleMenu()">☰</button>
+    <div class="logo-area">
+        <a href="#" class="logo-main">АРГУМЕНТ <span class="logo-red">TV</span></a>
+        <small style="font-size: 10px; color: #888;">ТВІЙ ГОЛОВНИЙ АРГУМЕНТ</small>
+    </div>
+    <div id="clock" style="font-family: monospace; font-size: 18px; font-weight: bold;">00:00:00</div>
+</header>
 
-    <!-- Бічне меню -->
-<!-- ПОВНЕ МЕНЮ З ЧАТОМ, АНЕКДОТАМИ ТА ГОРОСКОПОМ -->
-    function toggleMenu() {
-    const menu = document.getElementById('sideMenu');
-    if (menu.style.left === '0px') {
-        menu.style.left = '-100%';
-    } else {
-        menu.style.left = '0px';
-    }
-}
-
-<div id="sideMenu" class="side-menu" style="position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: #111; z-index: 2000; transition: 0.4s; padding: 20px; box-sizing: border-box; overflow-y: auto; color: white; font-family: sans-serif;">
-    
-    <!-- Кнопка закриття -->
-    <a href="javascript:void(0)" onclick="toggleMenu()" style="color: #e30613; text-decoration: none; font-weight: bold; display: block; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">✖ ЗАКРИТИ МЕНЮ</a>
-
-    <!-- Соцмережі -->
-    <a href="https://www.facebook.com/groups/balta.city" target="_blank" style="color: white; text-decoration: none; display: block; margin-bottom: 15px; font-size: 0.9rem;">🌐 Наш Facebook (Балта)</a>
-    <a href="https://balta-otg.gov.ua/" target="_blank" style="color: white; text-decoration: none; display: block; margin-bottom: 15px; font-size: 0.9rem;">🏛 Новини Балтської ОТГ</a>
-
-    <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
-
-    <!-- РОЗВАГИ: АНЕКДОТИ -->
-    <button onclick="showBaltyJoke()" style="width: 100%; padding: 10px; background: #e30613; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 15px;">🎭 АНЕКДОТ ДНЯ</button>
-
-    <!-- РОЗВАГИ: ГОРОСКОП -->
-    <div style="background: #222; padding: 15px; border-radius: 8px; border-left: 3px solid #e30613; margin-bottom: 20px;">
-        <h4 style="margin: 0 0 10px 0; font-size: 0.8rem; color: #e30613; text-transform: uppercase;">🔮 Гороскоп Балтський</h4>
-        <select id="zodiac" onchange="runHoroscope()" style="width: 100%; padding: 8px; background: #000; color: white; border: 1px solid #444; border-radius: 5px;">
-            <option value="">Обери свій знак...</option>
-            <option value="Овен">Овен ♈</option>
-            <option value="Телець">Телець ♉</option>
-            <option value="Близнюки">Близнюки ♊</option>
-            <option value="Рак">Рак ♋</option>
-            <option value="Лев">Лев ♌</option>
-            <option value="Діва">Діва ♍</option>
-            <option value="Терези">Терези ♎</option>
-            <option value="Скорпіон">Скорпіон ♏</option>
-            <option value="Стрілець">Стрілець ♐</option>
-            <option value="Козеріг">Козеріг ♑</option>
-            <option value="Водолій">Водолій ♒</option>
-            <option value="Риби">Риби ♓</option>
-        </select>
-        <p id="h-text" style="font-size: 0.75rem; color: #ccc; margin-top: 10px; line-height: 1.4;"></p>
+<div class="container">
+    <!-- Ефір -->
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/live_stream?channel=UC7_h0_9IqI-I" allowfullscreen></iframe>
     </div>
 
-    <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
-
-    <!-- ЧАТ -->
-    <h4 style="color: #e30613; font-size: 0.8rem; text-align: center; margin-bottom: 10px;">ЧАТ ГРОМАДИ</h4>
-    <div style="width: 100%; height: 350px; background: #000; border: 1px solid #333; border-radius: 5px; overflow: hidden;">
-        <iframe src="https://argument-tv.chatango.com" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
+    <!-- Карта тривог -->
+    <span class="section-title">Оперативна карта тривог</span>
+    <div style="width: 100%; height: 400px; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+        <iframe src="https://alerts.in.ua/" style="width: 100%; height: 100%;"></iframe>
     </div>
-
-    <!-- СКРИПТИ ЛОГІКИ (Тільки для меню) -->
-    <script>
-        function showBaltyJoke() {
-            const jokes = [
-                "У Балті на ринку: — Жіночко, чого ваша ковбаса така дорога? — Бо вона з Подільська пішки йшла!",
-                "Новини Аргумент TV: В Балті зафіксовано аномалію — людина пройшла повз 'Копійку' і нічого не купила.",
-                "— Куме, а де в Балті найкращий інтернет? — На пошті, там коли черга стоїть, швидкість передачі пліток 5G!",
-                "Балтський джентльмен — це той, хто виходячи з електрички, притримує двері куму з двома мішками картоплі.",
-                "Оголошення: Вивезу сміття. Дорого. Красиво. З музикою Аргумент TV.",
-                "У Балтській мерії: — Чому в нас дороги такі криві? — Щоб ворог не доїхав до вокзалу!",
-                "— Чому балтські коти найтовстіші в області? — Бо вони під'їдають за тими, хто не доїв шаурму на площі.",
-                "Зустрілися двоє в Балті: — Ти де зараз працюєш? — На Аргумент TV. — О, то ти тепер знаєш, коли в нас воду вимкнуть?",
-                "Прикмета: Якщо на балтському ринку тихо — значить, сьогодні понеділок.",
-                "— Тату, я хочу бути космонавтом! — Ні, синку, будеш таксистом у Балті, там ями такі ж, як кратери на Місяці.",
-                "Балтська дієта: вранці — кава з видом на собор, ввечері — насіння біля будинку.",
-                "— Куме, а що то за черга на площі? — Та то люди чекають, поки Аргумент TV анекдоти оновить!",
-                "Тільки в Балті можна почути: — Я за вами в черзі стояв ще коли долар був по вісім!",
-                "— Жіночко, а ваші яблука точно з Балти? — А що, ви паспорт у них хочете перевірити?",
-                "Коли в Балті випадає сніг, таксисти автоматично стають пілотами всюдиходів."
-            ];
-            alert(jokes[Math.floor(Math.random() * jokes.length)]);
-        }
-
-        function runHoroscope() {
-            const s = document.getElementById('zodiac').value;
-            const t = document.getElementById('h-text');
-            if(!s) { t.innerText = ""; return; }
-            const p = [
-                "Сьогодні в Балті на вас чекає приємна зустріч біля фонтану.",
-                "Вдалий день для покупок на ринку. Торгуйтеся до останнього!",
-                "Зірки радять сьогодні подивитися Аргумент TV у колі друзів.",
-                "Будьте обережні на дорогах, особливо біля переїзду.",
-                "Вечір принесе гарні новини від родичів з Подільська.",
-                "Фінансовий успіх чекає на тих, хто не витрачає все в 'Копійці'.",
-                "Чудовий день для прогулянки вздовж Кодими."
-            ];
-            t.innerHTML = "<strong>" + s + ":</strong> " + p[Math.floor(Math.random() * p.length)];
-        }
-    </script>
 </div>
 
-
-        <!-- Відеоплеєр -->
-        <section class="video-section">
-            <video id="video" controls playsinline></video>
-            <div class="live-indicator">● LIVE</div>
-        </section>
-
-        <!-- Жива карта тривог -->
-<section id="alert-banner" style="background: #000; padding: 5px; border-bottom: 2px solid #e30613;">
-    <div style="color: white; font-size: 0.8rem; margin: 5px 0; text-align: center; font-weight: bold;">
-        ОПЕРАТИВНА КАРТА ТРИВОГ
-    </div>
-    <div style="width: 100%; height: 250px; overflow: hidden; border-radius: 4px;">
-        <iframe 
-            src="https://alerts.in.ua/widgets/map" 
-            width="100%" 
-            height="100%" 
-            frameborder="0" 
-            style="border:0;" 
-            allowfullscreen>
-        </iframe>
-    </div>
-</section>
-
-
-        <!-- Радіоплеєр -->
-        <section class="radio-section">
-            <h3>Радіо Балта FM</h3>
-            <audio id="radio-player" src="https://podilske.com:8013/online"></audio>
-            <button id="playRadio" class="radio-btn">PLAY</button>
-        </section>
-
-        <!-- Погода -->
-        <section class="weather-section">
-            <div class="weather-header">
-                <select id="city-select">
-                    <option value="Balta">Балта</option>
-                    <option value="Podilsk">Подільськ</option>
-                    <option value="Kodyma">Кодима</option>
-                    <option value="Ananiv">Ананьїв</option>
-                    <option value="Liubashivka">Любашівка</option>
-                    <option value="Savran">Саврань</option>
-                </select>
-            </div>
-            <div id="weather-info" class="weather-details">
-                <span class="temp">--°C</span> | <span class="desc">Завантаження...</span>
-            </div>
-        </section>
-
-        <!-- Стрічка новин -->
-        <section class="news-feed">
-            <h2>ОСТАННІ НОВИНИ</h2>
-            <div id="news-container">
-                <!-- Тут з'являтимуться новини через JS -->
-                <p class="loading-text">Оновлення стрічки...</p>
-            </div>
-        </section>
-    </main>
-
-    <!-- Футер -->
-    <footer class="main-footer">
-        <p>Аргумент TV є агрегатором новин. Весь аудіовізуальний контент належить законним особам ТОВ «Віжн ФМ» та Національна Суспільна Телерадіокомпанія України. 2026 рік</p>
-    </footer>
-<script>
-// --- 1. ГОДИННИК ---
-function updateClock() {
-    const el = document.getElementById('digital-clock');
-    if(el) el.textContent = new Date().toLocaleTimeString('uk-UA', { hour12: false });
-}
-setInterval(updateClock, 1000);
-
-// --- 2. ВАЛЮТИ НБУ ---
-async function fetchCurrency() {
-    try {
-        const resp = await fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json');
-        const data = await resp.json();
-        const codes = ['USD', 'EUR', 'GBP', 'PLN', 'MDL'];
-        let text = "Курс НБУ: ";
-        data.filter(i => codes.includes(i.cc)).forEach(i => {
-            text += `${i.cc}: ${i.rate.toFixed(2)} | `;
-        });
-        const marq = document.querySelector('.currency-bar marquee');
-        if(marq) marq.textContent = text;
-    } catch(e) { console.error("Currency error"); }
-}
-
-// --- 3. ПОГОДА (НОВИЙ НАДІЙНИЙ СЕРВІС) ---
-async function updateWeather(city) {
-    const coords = {
-        "Balta": {lat: 47.93, lon: 29.62}, "Podilsk": {lat: 47.74, lon: 29.53},
-        "Kodyma": {lat: 48.09, lon: 29.12}, "Ananiv": {lat: 47.72, lon: 29.96},
-        "Liubashivka": {lat: 47.83, lon: 30.25}, "Savran": {lat: 48.13, lon: 30.08},
-        "Pishchana": {lat: 48.20, lon: 29.75}, "Zelenogirske": {lat: 47.84, lon: 30.22},
-        "Slobidka": {lat: 47.88, lon: 29.35}, "Okny": {lat: 47.53, lon: 29.46}
-    };
-    const c = coords[city];
-    try {
-        const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&current_weather=true`);
-        const data = await resp.json();
-        const temp = Math.round(data.current_weather.temperature);
-        const code = data.current_weather.weathercode;
-        
-        let desc = "Ясно";
-        if (code > 0 && code < 4) desc = "Хмарно";
-        if (code >= 45 && code < 50) desc = "Туман";
-        if (code >= 51 && code < 70) desc = "Дощ";
-        if (code >= 71) desc = "Сніг";
-
-        document.querySelector('.temp').textContent = `${temp}°C`;
-        document.querySelector('.desc').textContent = desc;
-    } catch(e) { 
-        document.querySelector('.desc').textContent = "Оновлення..."; 
-    }
-}
-
-// --- 4. НОВИНИ (6 ДЖЕРЕЛ + АРХІВ 8 ГОДИН) ---
-async function fetchNews() {
-    const container = document.getElementById('news-container');
-    if(!container) return;
-    const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
-    const sources = {
-        "УП": "https://www.pravda.com.ua/rss/",
-        "Громадське": "https://hromadske.ua/rss",
-        "Суспільне": "https://suspilne.media/rss/99.rss",
-        "Думська": "https://dumskaya.net/rssnews.xml",
-        "24 Канал": "https://24tv.ua/rss/allNews.xml",
-        "Південь Сьогодні": "https://yug.today/feed/"
-    };
-
-    let allNews = [];
-    for (let [name, url] of Object.entries(sources)) {
-        try {
-            const resp = await fetch(proxy + encodeURIComponent(url));
-            const data = await resp.json();
-            if (data.items) {
-                data.items.forEach(item => {
-                    allNews.push({
-                        title: item.title, link: item.link,
-                        time: new Date(item.pubDate.replace(/-/g, "/")), source: name
-                    });
-                });
-            }
-        } catch (e) { console.log(name + " error"); }
-    }
-
-    allNews.sort((a, b) => b.time - a.time);
-    const limit = new Date(Date.now() - 8 * 60 * 60 * 1000);
-    const filtered = allNews.filter(n => n.time > limit);
-
-    container.innerHTML = filtered.map(n => `
-        <a href="${n.link}" target="_blank" class="news-item" style="display:block; padding:12px; border-bottom:1px solid #222; text-decoration:none; color:white;">
-            <div style="font-size:0.8rem; color:#e30613; margin-bottom:4px;">${n.source} | ${n.time.getHours()}:${String(n.time.getMinutes()).padStart(2, '0')}</div>
-            <div style="font-weight:bold; line-height:1.3;">${n.title}</div>
-        </a>
-    `).join('');
-}
-
-// --- 5. ЗАПУСК ТА ЛОГІКА МЕНЮ ---
-window.onload = () => {
-    // Оновлюємо напис LIVE на АРГУМЕНТ TV
-    const liveInd = document.querySelector('.live-indicator');
-    if(liveInd) {
-        liveInd.style.color = "white";
-        liveInd.innerHTML = 'АРГУМЕНТ <span style="color:#e30613">TV</span>';
-    }
-
-    // Плеєри
-    const v = document.getElementById('video');
-    const src = 'https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8';
-    if (v) {
-        if (Hls.isSupported()) {
-            const hls = new Hls(); hls.loadSource(src); hls.attachMedia(v);
-        } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
-            v.src = src;
-        }
-    }
-
-    const r = document.getElementById('radio-player');
-    const btn = document.getElementById('playRadio');
-    if(btn && r) {
-        btn.onclick = () => {
-            if (r.paused) { r.play(); btn.textContent = "STOP"; }
-            else { r.pause(); btn.textContent = "PLAY"; }
-        };
-    }
-
-    // Початкові запуски
-    updateClock(); fetchCurrency(); fetchNews(); updateWeather("Balta");
-    setInterval(fetchNews, 300000);
-
-    // Робота Меню
-    const menu = document.getElementById('sideMenu');
-    const menuBtn = document.getElementById('menuBtn');
+<!-- БІЧНЕ МЕНЮ -->
+<div id="sideMenu" class="side-menu">
+    <a href="javascript:void(0)" onclick="toggleMenu()" style="color: #e30613; text-align: right; font-size: 20px;">✖</a>
+    <a href="https://www.facebook.com/groups/balta.city" target="_blank">🌐 Наш Facebook (Балта)</a>
+    <a href="https://balta-otg.gov.ua/" target="_blank">🏛 Новини Балтської ОТГ</a>
     
-    if(menuBtn && menu) {
-        menuBtn.onclick = (e) => {
-            e.stopPropagation();
-            menu.classList.toggle('active');
-        };
+    <button onclick="showJoke()">🎭 АНЕКДОТ ДНЯ</button>
 
-        // Закриття при кліку поза меню
-        document.addEventListener('click', (e) => {
-            if (!menu.contains(e.target) && menu.classList.contains('active')) {
-                menu.classList.remove('active');
-            }
-        });
+    <div style="margin-top: 20px; background: #222; padding: 15px; border-radius: 8px;">
+        <span style="color: #e30613; font-size: 0.8rem;">🔮 БАЛТСЬКИЙ ГОРОСКОП</span>
+        <select id="zodiac" onchange="getHoroscope()" style="width: 100%; margin-top: 10px; padding: 8px; background: #000; color: #fff; border: 1px solid #444;">
+            <option value="">Обери знак...</option>
+            <option value="Овен">Овен</option><option value="Телець">Телець</option><option value="Близнюки">Близнюки</option>
+            <option value="Рак">Рак</option><option value="Лев">Лев</option><option value="Діва">Діва</option>
+            <option value="Терези">Терези</option><option value="Скорпіон">Скорпіон</option><option value="Стрілець">Стрілець</option>
+            <option value="Козеріг">Козеріг</option><option value="Водолій">Водолій</option><option value="Риби">Риби</option>
+        </select>
+        <p id="horoText" style="font-size: 0.8rem; margin-top: 10px; color: #ccc;"></p>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <span class="section-title">Чат громади</span>
+        <iframe src="https://argument-tv.chatango.com" width="100%" height="300" frameborder="0"></iframe>
+    </div>
+</div>
+
+<script>
+    // Годинник
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toLocaleTimeString('uk-UA');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Меню
+    function toggleMenu() {
+        document.getElementById('sideMenu').classList.toggle('active');
     }
 
-    // Анекдоти
-    const jokeBtn = document.getElementById('jokeBtn');
-    if(jokeBtn) {
-        jokeBtn.onclick = (e) => {
-            e.preventDefault();
-            const jokes = [
-                "Балта: Знайшли гаманець. Господарю прохання не турбувати, ми купили радіо!",
-                "Аргумент TV: Ми знаємо новини раніше, ніж вони стаються.",
-                "Сьогодні було так сонячно, що погода в смартфоні заплющила очі."
-            ];
-            document.getElementById('joke-display').innerHTML = `
-                <p style="padding:15px; color:white; border-left:4px solid #e30613; background:#1a1a1a; margin-top:10px; font-size:0.9rem;">
-                    ${jokes[Math.floor(Math.random()*jokes.length)]}
-                </p>`;
-        };
+    // Анекдоти (15 шт)
+    function showJoke() {
+        const jokes = [
+            "У Балті на ринку: — Жіночко, чого ваша ковбаса така дорога? — Бо вона з Подільська пішки йшла!",
+            "Новини Аргумент TV: В Балті зафіксовано аномалію — людина пройшла повз 'Копійку' і нічого не купила.",
+            "Прикмета: Якщо на балтському ринку тихо — значить, сьогодні понеділок.",
+            "В Балті відкрили новий телеканал Аргумент TV. Тепер плітки поширюються зі швидкістю світла!",
+            "Балтський джентльмен завжди поступається місцем дамі, якщо вона несе два кавуни з ринку.",
+            "Оголошення: Продам ями на дорозі. Самовивіз. Бюджет Балти.",
+            "Тільки в Балті таксист може розповісти історію міста краще за будь-якого екскурсовода.",
+            "— Куме, а ви знаєте, що в Балті інтернет 5G? — Та я знаю, кума в вікно глянула і вже все місто знає!",
+            "У Балтській мерії: — Чому в нас такі дороги? — Щоб туристи довше милувалися краєвидами!",
+            "Зустрілися двоє в Балті: — Ти куди? — На вокзал. — О, в Подільськ? — Ні, подивитися на поїзд, кажуть, він справжній!",
+            "Балтська дієта: Кава біля собору зранку, насіння на лавці ввечері.",
+            "— Тату, я хочу бути таксистом у Балті! — Ні, синку, там треба знати кожну ямку по імені.",
+            "На ринку: — Ваші яблука точно місцеві? — Звісно! Вранці ще на дереві в Пасаті висіли!",
+            "В Балті найшвидший зв'язок — це коли сусіди побачили, що ти купив новий телевізор.",
+            "Чому в Балті не потрібні GPS? Бо кожна бабуся біля під'їзду знає, куди ти йдеш!"
+        ];
+        alert(jokes[Math.floor(Math.random() * jokes.length)]);
     }
 
-    // Вибір міста
-    const citySel = document.getElementById('city-select');
-    if(citySel) citySel.onchange = (e) => updateWeather(e.target.value);
-};
+    // Гороскоп
+    function getHoroscope() {
+        const sign = document.getElementById('zodiac').value;
+        const out = document.getElementById('horoText');
+        if(!sign) return;
+        const predicts = [
+            "День вдалий для походу на балтський ринок. Знайдете знижки!",
+            "Зірки радять подивитися Аргумент TV — дізнаєтесь щось важливе.",
+            "Будьте обережні з таксистами, вони сьогодні надто говіркі.",
+            "Вечір принесе приємні новини від кумів.",
+            "Фінансовий успіх чекає на тих, хто не витратить усе в 'Копійці'.",
+            "Сприятливий день для прогулянки біля собору."
+        ];
+        out.innerHTML = "<strong>" + sign + ":</strong> " + predicts[Math.floor(Math.random() * predicts.length)];
+    }
 </script>
-
-function toggleMenu() {
-    const menu = document.getElementById('sideMenu');
-    // Перевіряємо поточне положення. Якщо воно не 0px — висуваємо.
-    if (menu.style.left === '0px') {
-        menu.style.left = '-100%';
-    } else {
-        menu.style.left = '0px';
-    }
-}
 
 </body>
 </html>
