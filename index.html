@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Аргумент TV — Новинний Агрегатор</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Підключаємо шрифт схожий на логотип -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Бібліотека для m3u8 відео -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+
+    <!-- Шапка сайту -->
+    <header class="main-header">
+        <div class="header-top">
+            <button class="burger-menu" id="menuBtn">
+                <span></span><span></span><span></span>
+            </button>
+            <img src="logo.png" alt="Аргумент TV" class="main-logo">
+            <div id="digital-clock" class="clock">00:00:00</div>
+        </div>
+        
+        <!-- Курс валют -->
+        <div class="currency-bar">
+            <marquee behavior="scroll" direction="left">
+                НБУ: USD: --.-- | EUR: --.-- | GBP: --.-- | PLN: --.-- | MDL: --.--
+            </marquee>
+        </div>
+    </header>
+
+    <!-- Бічне меню -->
+    <nav class="side-menu" id="sideMenu">
+        <ul>
+            <li><a href="#" id="jokeBtn">🎭 Анекдот дня</a></li>
+            <li><a href="https://www.facebook.com/share/g/18Eok1LxGM/" target="_blank">🏛 Офіційні новини Балтської ОТГ</a></li>
+        </ul>
+        <div id="joke-display" class="joke-box"></div>
+    </nav>
+
+    <main class="content">
+        <!-- Відеоплеєр -->
+        <section class="video-section">
+            <video id="video" controls playsinline></video>
+            <div class="live-indicator">● LIVE</div>
+        </section>
+
+        <!-- Банер тривоги -->
+        <section id="alert-banner" class="alert-banner status-green">
+            <div class="alert-title">ВІДБІЙ. Подільський район</div>
+            <div class="alert-reason">Чисте небо</div>
+        </section>
+
+        <!-- Радіоплеєр -->
+        <section class="radio-section">
+            <h3>Радіо Балта FM</h3>
+            <audio id="radio-player" src="https://podilske.com:8013/online"></audio>
+            <button id="playRadio" class="radio-btn">PLAY</button>
+        </section>
+
+        <!-- Погода -->
+        <section class="weather-section">
+            <div class="weather-header">
+                <select id="city-select">
+                    <option value="Balta">Балта</option>
+                    <option value="Podilsk">Подільськ</option>
+                    <option value="Kodyma">Кодима</option>
+                    <option value="Ananiv">Ананьїв</option>
+                    <option value="Liubashivka">Любашівка</option>
+                    <option value="Savran">Саврань</option>
+                </select>
+            </div>
+            <div id="weather-info" class="weather-details">
+                <span class="temp">--°C</span> | <span class="desc">Завантаження...</span>
+            </div>
+        </section>
+
+        <!-- Стрічка новин -->
+        <section class="news-feed">
+            <h2>ОСТАННІ НОВИНИ</h2>
+            <div id="news-container">
+                <!-- Тут з'являтимуться новини через JS -->
+                <p class="loading-text">Оновлення стрічки...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Футер -->
+    <footer class="main-footer">
+        <p>Аргумент TV є агрегатором новин. Весь аудіовізуальний контент належить законним особам ТОВ «Віжн ФМ» та Національна Суспільна Телерадіокомпанія України. 2026 рік</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

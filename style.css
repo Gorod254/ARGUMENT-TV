@@ -1,0 +1,197 @@
+:root {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --accent-color: #e30613; /* Червоний як у лого */
+    --gray-color: #1a1a1a;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Oswald', sans-serif;
+    padding-bottom: 50px; /* Місце під футер */
+}
+
+/* Шапка */
+.main-header {
+    background: var(--bg-color);
+    padding: 10px 15px;
+    border-bottom: 2px solid var(--accent-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-logo {
+    height: 40px;
+    object-fit: contain;
+}
+
+.clock {
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+
+.currency-bar {
+    font-size: 0.8rem;
+    padding-top: 5px;
+    color: #ccc;
+}
+
+/* Меню Бургер */
+.burger-menu {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.burger-menu span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: var(--text-color);
+}
+
+/* Відеоплеєр */
+.video-section {
+    position: relative;
+    width: 100%;
+    background: #000;
+}
+
+video {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+}
+
+.live-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: var(--accent-color);
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* Банер тривоги */
+.alert-banner {
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.status-red { background-color: var(--accent-color); }
+.status-green { background-color: #28a745; }
+
+.alert-reason {
+    font-size: 0.8rem;
+    font-weight: normal;
+    text-transform: lowercase;
+}
+
+/* Радіо */
+.radio-section {
+    background: var(--gray-color);
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 10px;
+}
+
+.radio-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    font-family: 'Oswald';
+    font-size: 1.2rem;
+    border-radius: 5px;
+}
+
+/* Погода */
+.weather-section {
+    padding: 15px;
+    border-top: 1px solid #333;
+}
+
+#city-select {
+    background: #000;
+    color: #fff;
+    border: 1px solid var(--accent-color);
+    padding: 5px;
+    font-family: 'Oswald';
+}
+
+/* Новини */
+.news-feed { padding: 15px; }
+
+.news-item {
+    border-bottom: 1px solid #222;
+    padding: 12px 0;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.news-source {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    margin-right: 10px;
+}
+
+.news-time {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+/* Меню (виїзне) */
+.side-menu {
+    position: fixed;
+    left: -250px;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background: #111;
+    transition: 0.3s;
+    z-index: 200;
+    padding: 20px;
+}
+
+.side-menu.active { left: 0; }
+
+.side-menu ul { list-style: none; padding: 0; }
+
+.side-menu a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 15px 0;
+    border-bottom: 1px solid #222;
+}
+
+/* Футер */
+.main-footer {
+    font-size: 0.7rem;
+    color: #555;
+    padding: 20px;
+    text-align: center;
+    background: #050505;
+}
+
+/* Адаптація під мобільні */
+@media (max-width: 600px) {
+    .header-top { padding: 5px; }
+    .main-logo { height: 30px; }
+}
