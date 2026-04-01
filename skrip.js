@@ -83,3 +83,39 @@ document.getElementById('jokeBtn').addEventListener('click', (e) => {
     const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
     document.getElementById('joke-display').innerHTML = `<p style="padding:10px; background:#222; border-left:3px solid red;">${randomJoke}</p>`;
 });
+// 7. ЛОГІКА ПОГОДИ
+const weatherData = {
+    "Balta": {lat: 47.93, lon: 29.62},
+    "Podilsk": {lat: 47.74, lon: 29.53},
+    "Kodyma": {lat: 48.09, lon: 29.12},
+    "Ananiv": {lat: 47.72, lon: 29.96},
+    "Liubashivka": {lat: 47.83, lon: 30.25},
+    "Savran": {lat: 48.13, lon: 30.08}
+};
+
+async function updateWeather(city) {
+    const coords = weatherData[city];
+    try {
+        // Використовуємо відкрите API (7-timer) для прогнозу без ключів
+        const resp = await fetch(`https://www.7timer.info/bin/api.pl?lon=${coords.lon}&lat=${coords.lat}&product=civil&output=json`);
+        const data = await resp.json();
+        
+        const current = data.dataseries[0];
+        const temp = current.temp2m;
+        const weatherState = current.weather;
+        
+        document.querySelector('.temp').textContent = `${temp}°C`;
+        document.querySelector('.desc').textContent = `Стан: ${weatherState}`;
+    } catch (e) {
+        document.querySelector('.desc').textContent = "Помилка оновлення";
+    }
+}
+
+// Слухаємо зміну міста в списку
+document.getElementById('city-select').addEventListener('change', (e) => {
+    updateWeather(e.target.value);
+});
+
+// Запускаємо погоду для Балти при старті
+updateWeather("Balta");
+
