@@ -22,12 +22,19 @@
 
         .section-title { color: var(--red); font-weight: bold; font-size: 14px; text-transform: uppercase; margin: 15px 0 10px; display: block; text-align: center; }
 
-        /* ПОГОДА */
-        .weather-card { background: #111; border: 1px solid #333; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
-        .weather-widget-container { width: 100%; min-height: 150px; }
+       <!-- ПОГОДА В РАЙОНІ -->
+<span class="section-title">☁️ ПОГОДА В РАЙОНІ</span>
+<div style="background: #111; border: 1px solid #e30613; border-radius: 8px; padding: 10px; margin-bottom: 20px;">
+    <iframe src="https://sinoptik.ua/informers/glass/balta?type=blue" width="100%" height="150" frameborder="0" scrolling="no"></iframe>
+    <p style="font-size: 10px; color: #666; margin-top: 5px;">Натисніть на назву міста в інформері, щоб змінити населений пункт</p>
+</div>
 
-        /* НОВИНИ */
-        .news-box { background: #111; border-radius: 8px; border-top: 3px solid var(--red); height: 500px; overflow: hidden; }
+        <!-- НОВИНИ -->
+<span class="section-title">🗞️ ОСТАННІ НОВИНИ УКРАЇНИ</span>
+<div style="background: #fff; border-radius: 8px; height: 500px; overflow-y: auto; border-top: 5px solid #e30613;">
+    <iframe src="https://rss.app/embed/v1/wall/t9e7m3oG29oN2NlU" frameborder="0" width="100%" height="1000"></iframe>
+</div>
+
 
         /* МЕНЮ */
         .side-menu { position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: #111; z-index: 2000; transition: 0.4s; padding: 20px; box-sizing: border-box; border-right: 2px solid var(--red); }
