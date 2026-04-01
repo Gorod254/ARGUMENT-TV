@@ -118,4 +118,83 @@ document.getElementById('city-select').addEventListener('change', (e) => {
 
 // Запускаємо погоду для Балти при старті
 updateWeather("Balta");
+// 8. АГРЕГАТОР НОВИН (6 ДЖЕРЕЛ)
+const RSS_SOURCES = {
+    "УП": "https://www.pravda.com.ua/rss/",
+    "Громадське": "https://hromadske.ua/rss",
+    "Суспільне": "https://suspilne.media/rss/99.rss",
+    "Думська": "https://dumskaya.net/rssnews.xml",
+    "24 Канал": "https://24tv.ua/rss/allNews.xml",
+    "Південь Сьогодні": "https://yug.today/feed/"
+};
+
+async function fetchNews() {
+    const container = document.getElementById('news-container');
+    let allNews = [];
+
+    for (let [name, url] of Object.entries(RSS_SOURCES)) {
+        try {
+            // Використовуємо проксі для обходу CORS
+            const resp = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
+            const data = await resp.json();
+            
+            if (data.items) {
+                data.items.forEach(item => {
+                    allNews.push({
+                        title: item.title,
+                        link: item.link,
+                        time: new Date(item.pubDate),
+                        source: name
+                    });
+                });
+            }
+        } catch (e) { console.error("Помилка завантаження RSS: " + name); }
+    }
+
+    // Сортуємо: найсвіжіші зверху
+    allNews.sort((a, b) => b.time - a.time);
+
+    // Фільтруємо архів за останні 8 годин
+    const eightHoursAgo = new Date(Date.now() - 8 * 60 * 60 * 1000);
+    allNews = allNews.filter(item => item.time > eightHoursAgo);
+
+    // Виводимо на екран
+    container.innerHTML = allNews.map(item => `
+        <a href="${item.link}" target="_blank" class="news-item">
+            <span class="news-source">[${item.source}]</span>
+            <span class="news-time">${item.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            <div class="news-title">${item.title}</div>
+        </a>
+    `).join('');
+}
+
+// Оновлювати новини кожні 5 хвилин
+setInterval(fetchNews, 300000);
+fetchNews();
+
+// 9. БАНЕР ТРИВОГИ (Імітація логіки)
+async function checkAlerts() {
+    const banner = document.getElementById('alert-banner');
+    const title = banner.querySelector('.alert-title');
+    const reason = banner.querySelector('.alert-reason');
+
+    try {
+        // Тут ми пізніше підключимо реальний API тривог. 
+        // Поки що логіка перевірки:
+        const isAlert = false; // Зміни на true для тесту червоного банера
+
+        if (isAlert) {
+            banner.className = "alert-banner status-red";
+            title.textContent = "🔴 ТРИВОГА. Подільський район!";
+            reason.textContent = "Загроза балістики / МіГ-31К";
+        } else {
+            banner.className = "alert-banner status-green";
+            title.textContent = "🟢 ВІДБІЙ. Подільський район";
+            reason.textContent = "Чисте небо";
+        }
+    } catch (e) { console.log("Помилка моніторингу тривог"); }
+}
+
+setInterval(checkAlerts, 60000); // Перевірка тривоги щохвилини
+checkAlerts();
 
