@@ -31,33 +31,20 @@
     </header>
 
     <!-- Бічне меню -->
-    <nav class="side-menu" id="sideMenu">
-        <ul>
-            <li><a href="#" id="jokeBtn">🎭 Анекдот дня</a></li>
-            <li><a href="https://www.facebook.com/share/g/18Eok1LxGM/" target="_blank">🏛 Офіційні новини Балтської ОТГ</a></li>
-        </ul>
-        <div id="joke-display"<!-- Розділ чату в меню -->
-<div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; position: relative;">
-    <h4 style="color: #e30613; font-size: 0.9rem; margin-bottom: 10px; text-align: center; text-transform: uppercase;">
-        Чат громади
-    </h4>
+    <div id="sideMenu" class="side-menu">
+    <a href="#" onclick="toggleMenu()">✖ Закрити меню</a>
+    <a href="#">🎭 Анекдот дня</a>
+    <a href="#">🏛 Офіційні новини Балтської ОТГ</a>
     
-    <div id="chat-wrapper" style="width: 100%; height: 350px; background: #000; overflow: hidden;">
-        <script id="cid0020000373465355428" data-cfasync="false" async src="//st.chatango.com/js/gz/emb.js" style="width: 100%; height: 100%;">
-        {
-            "handle":"argument-tv",
-            "arch":"js",
-            "styles":{
-                "a":"111111","b":100,"c":"FFFFFF","d":"FFFFFF",
-                "k":"e30613","l":"e30613","m":"e30613","n":"FFFFFF",
-                "q":"e30613","r":100
-            }
-        }
-        </script>
+    <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+    
+    <h4 style="color: #e30613; text-align: center; font-size: 0.9rem; margin-bottom: 10px;">ЧАТ ГРОМАДИ</h4>
+    
+    <div style="width: 100%; height: 400px; background: #000; overflow: hidden;">
+        <iframe src="https://argument-tv.chatango.com" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
     </div>
 </div>
 
-    <main class="content">
         <!-- Відеоплеєр -->
         <section class="video-section">
             <video id="video" controls playsinline></video>
