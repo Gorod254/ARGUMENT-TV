@@ -159,15 +159,17 @@ video {
 /* Меню (виїзне) */
 .side-menu {
     position: fixed;
-    left: -250px;
     top: 0;
-    width: 250px;
+    left: -100%; /* Це сховає його повністю, як би не мінялася ширина */
+    width: 280px;
     height: 100%;
     background: #111;
     transition: 0.3s;
-    z-index: 200;
+    z-index: 1000; /* Піднімаємо вище за відео */
     padding: 20px;
+    box-sizing: border-box; /* Важливо: щоб падінги не розширювали меню */
 }
+
 
 .side-menu.active { left: 0; }
 
