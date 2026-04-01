@@ -108,34 +108,44 @@ async function fetchCurrency() {
         data.filter(i => codes.includes(i.cc)).forEach(i => {
             text += `${i.cc}: ${i.rate.toFixed(2)} | `;
         });
-        document.querySelector('.currency-bar marquee').textContent = text;
+        const marq = document.querySelector('.currency-bar marquee');
+        if(marq) marq.textContent = text;
     } catch(e) { console.error("Currency error"); }
 }
 
-// --- 3. ПОГОДА ---
-const weatherCoords = {
-    "Balta": {lat: 47.93, lon: 29.62}, "Podilsk": {lat: 47.74, lon: 29.53},
-    "Kodyma": {lat: 48.09, lon: 29.12}, "Ananiv": {lat: 47.72, lon: 29.96},
-    "Liubashivka": {lat: 47.83, lon: 30.25}, "Savran": {lat: 48.13, lon: 30.08},
-    "Pishchana": {lat: 48.20, lon: 29.75}, "Zelenogirske": {lat: 47.84, lon: 30.22},
-    "Slobidka": {lat: 47.88, lon: 29.35}, "Okny": {lat: 47.53, lon: 29.46}
-};
-
+// --- 3. ПОГОДА (НОВИЙ НАДІЙНИЙ СЕРВІС) ---
 async function updateWeather(city) {
-    const c = weatherCoords[city];
+    const coords = {
+        "Balta": {lat: 47.93, lon: 29.62}, "Podilsk": {lat: 47.74, lon: 29.53},
+        "Kodyma": {lat: 48.09, lon: 29.12}, "Ananiv": {lat: 47.72, lon: 29.96},
+        "Liubashivka": {lat: 47.83, lon: 30.25}, "Savran": {lat: 48.13, lon: 30.08},
+        "Pishchana": {lat: 48.20, lon: 29.75}, "Zelenogirske": {lat: 47.84, lon: 30.22},
+        "Slobidka": {lat: 47.88, lon: 29.35}, "Okny": {lat: 47.53, lon: 29.46}
+    };
+    const c = coords[city];
     try {
-        const resp = await fetch(`https://www.7timer.info/bin/api.pl?lon=${c.lon}&lat=${c.lat}&product=civil&output=json`);
+        const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&current_weather=true`);
         const data = await resp.json();
-        const cur = data.dataseries[0];
-        document.querySelector('.temp').textContent = `${cur.temp2m}°C`;
-        const states = { "clearday": "Ясно", "pcloudy": "Мінлива хмарність", "mcloudy": "Хмарно", "cloudy": "Пасмурно", "rain": "Дощ", "snow": "Сніг" };
-        document.querySelector('.desc').textContent = states[cur.weather] || cur.weather;
-    } catch(e) { document.querySelector('.desc').textContent = "Помилка"; }
+        const temp = Math.round(data.current_weather.temperature);
+        const code = data.current_weather.weathercode;
+        
+        let desc = "Ясно";
+        if (code > 0 && code < 4) desc = "Хмарно";
+        if (code >= 45 && code < 50) desc = "Туман";
+        if (code >= 51 && code < 70) desc = "Дощ";
+        if (code >= 71) desc = "Сніг";
+
+        document.querySelector('.temp').textContent = `${temp}°C`;
+        document.querySelector('.desc').textContent = desc;
+    } catch(e) { 
+        document.querySelector('.desc').textContent = "Оновлення..."; 
+    }
 }
 
-// --- 4. НОВИНИ (АРХІВ 8 ГОДИН) ---
+// --- 4. НОВИНИ (6 ДЖЕРЕЛ + АРХІВ 8 ГОДИН) ---
 async function fetchNews() {
     const container = document.getElementById('news-container');
+    if(!container) return;
     const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
     const sources = {
         "УП": "https://www.pravda.com.ua/rss/",
@@ -167,57 +177,84 @@ async function fetchNews() {
     const filtered = allNews.filter(n => n.time > limit);
 
     container.innerHTML = filtered.map(n => `
-        <a href="${n.link}" target="_blank" class="news-item" style="display:block; padding:10px; border-bottom:1px solid #222; text-decoration:none; color:white;">
-            <div style="font-size:0.8rem; color:#e30613;">${n.source} | ${n.time.getHours()}:${String(n.time.getMinutes()).padStart(2, '0')}</div>
-            <div style="font-weight:bold; margin-top:5px;">${n.title}</div>
+        <a href="${n.link}" target="_blank" class="news-item" style="display:block; padding:12px; border-bottom:1px solid #222; text-decoration:none; color:white;">
+            <div style="font-size:0.8rem; color:#e30613; margin-bottom:4px;">${n.source} | ${n.time.getHours()}:${String(n.time.getMinutes()).padStart(2, '0')}</div>
+            <div style="font-weight:bold; line-height:1.3;">${n.title}</div>
         </a>
     `).join('');
 }
 
-// --- 5. ІНІЦІАЛІЗАЦІЯ ---
+// --- 5. ЗАПУСК ТА ЛОГІКА МЕНЮ ---
 window.onload = () => {
-    // Відео
-    const v = document.getElementById('video');
-    const src = 'https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8';
-    if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(src);
-        hls.attachMedia(v);
-    } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
-        v.src = src;
+    // Оновлюємо напис LIVE на АРГУМЕНТ TV
+    const liveInd = document.querySelector('.live-indicator');
+    if(liveInd) {
+        liveInd.style.color = "white";
+        liveInd.innerHTML = 'АРГУМЕНТ <span style="color:#e30613">TV</span>';
     }
 
-    // Радіо
+    // Плеєри
+    const v = document.getElementById('video');
+    const src = 'https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8';
+    if (v) {
+        if (Hls.isSupported()) {
+            const hls = new Hls(); hls.loadSource(src); hls.attachMedia(v);
+        } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
+            v.src = src;
+        }
+    }
+
     const r = document.getElementById('radio-player');
     const btn = document.getElementById('playRadio');
-    btn.onclick = () => {
-        if (r.paused) { r.play(); btn.textContent = "STOP"; }
-        else { r.pause(); btn.textContent = "PLAY"; }
-    };
+    if(btn && r) {
+        btn.onclick = () => {
+            if (r.paused) { r.play(); btn.textContent = "STOP"; }
+            else { r.pause(); btn.textContent = "PLAY"; }
+        };
+    }
 
-    // Інше
-    updateClock();
-    fetchCurrency();
-    fetchNews();
-    updateWeather("Balta");
+    // Початкові запуски
+    updateClock(); fetchCurrency(); fetchNews(); updateWeather("Balta");
     setInterval(fetchNews, 300000);
 
-    // Бургер
-    document.getElementById('menuBtn').onclick = () => document.getElementById('sideMenu').classList.toggle('active');
+    // Робота Меню
+    const menu = document.getElementById('sideMenu');
+    const menuBtn = document.getElementById('menuBtn');
     
-    // Анекдоти
-    document.getElementById('jokeBtn').onclick = (e) => {
-        e.preventDefault();
-        const jokes = [
-            "Новини: Сьогодні було так сонячно, що погода в смартфоні заплющила очі.",
-            "Балта: Знайшли гаманець. Господарю прохання не турбувати, ми купили радіо!",
-            "Аргумент TV: Ми знаємо новини раніше, ніж вони стаються."
-        ];
-        document.getElementById('joke-display').innerHTML = `<p style="padding:10px; color:white; border-left:3px solid red;">${jokes[Math.floor(Math.random()*jokes.length)]}</p>`;
-    };
+    if(menuBtn && menu) {
+        menuBtn.onclick = (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('active');
+        };
 
-    // Місто
-    document.getElementById('city-select').onchange = (e) => updateWeather(e.target.value);
+        // Закриття при кліку поза меню
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target) && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
+        });
+    }
+
+    // Анекдоти
+    const jokeBtn = document.getElementById('jokeBtn');
+    if(jokeBtn) {
+        jokeBtn.onclick = (e) => {
+            e.preventDefault();
+            const jokes = [
+                "Балта: Знайшли гаманець. Господарю прохання не турбувати, ми купили радіо!",
+                "Аргумент TV: Ми знаємо новини раніше, ніж вони стаються.",
+                "Сьогодні було так сонячно, що погода в смартфоні заплющила очі."
+            ];
+            document.getElementById('joke-display').innerHTML = `
+                <p style="padding:15px; color:white; border-left:4px solid #e30613; background:#1a1a1a; margin-top:10px; font-size:0.9rem;">
+                    ${jokes[Math.floor(Math.random()*jokes.length)]}
+                </p>`;
+        };
+    }
+
+    // Вибір міста
+    const citySel = document.getElementById('city-select');
+    if(citySel) citySel.onchange = (e) => updateWeather(e.target.value);
 };
 </script>
 
