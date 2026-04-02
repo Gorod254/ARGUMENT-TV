@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>АРГУМЕНТ TV — 2026</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root { --red: #e30613; --dark: #000; --gray: #111; --text: #eee; }
         body { background: var(--dark); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
@@ -149,8 +148,27 @@ updateWeather("Balta");
 document.getElementById('city-select').onchange = (e) => updateWeather(e.target.value);
 
 // --- НОВИНИ (6 джерел) ---
-async function fetchNews() {
+async function fetchNews() {async function fetchNews() {
+
+    const CACHE_KEY = "newsCache";
+    const CACHE_TIME_KEY = "newsCacheTime";
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 хвилин
+
+    const now = Date.now();
+    const cachedNews = localStorage.getItem(CACHE_KEY);
+    const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+
+    // --- Якщо кеш є і ще не старий ---
+    if (cachedNews && cachedTime && (now - cachedTime < CACHE_DURATION)) {
+        document.getElementById('news-container').innerHTML = cachedNews;
+        console.log("Новини з кешу");
+        return;
+    }
+
+    console.log("Завантаження новин з інтернету");
+
     const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
+
     const sources = [
         { name: "УП", url: "https://www.pravda.com.ua/rss/" },
         { name: "ТСН", url: "https://tsn.ua/rss/full.rss" },
@@ -159,13 +177,15 @@ async function fetchNews() {
         { name: "УНІАН", url: "https://rss.unian.net/site/news_ukr.rss" },
         { name: "АПОСТРОФ", url: "https://apostrophe.ua/ua/rss" }
     ];
-    
+
     let allNews = [];
+
     for (let src of sources) {
         try {
-            const r = await fetch(proxy + encodeURIComponent(src.url) + "&t=" + Date.now());
+            const r = await fetch(proxy + encodeURIComponent(src.url));
             const d = await r.json();
-            if(d.items) {
+
+            if (d.items) {
                 d.items.forEach(i => {
                     allNews.push({
                         title: i.title,
@@ -175,18 +195,31 @@ async function fetchNews() {
                     });
                 });
             }
+
         } catch(e) {}
     }
 
-    allNews.sort((a, b) => b.date - a.date); // Сортування за часом (свіжі зверху)
+    allNews.sort((a, b) => b.date - a.date);
 
-    document.getElementById('news-container').innerHTML = allNews.slice(0, 50).map(n => `
+    const newsHTML = allNews.slice(0, 50).map(n => `
         <a href="${n.link}" target="_blank" class="news-item">
-            <div class="news-meta">${n.source} | ${n.date.toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'})}</div>
-            <div style="font-weight:500; line-height:1.4;">${n.title}</div>
+            <div class="news-meta">
+                ${n.source} | 
+                ${n.date.toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'})}
+            </div>
+            <div style="font-weight:500; line-height:1.4;">
+                ${n.title}
+            </div>
         </a>
     `).join('');
+
+    document.getElementById('news-container').innerHTML = newsHTML;
+
+    // --- Зберігаємо кеш ---
+    localStorage.setItem(CACHE_KEY, newsHTML);
+    localStorage.setItem(CACHE_TIME_KEY, now);
 }
+    }
 fetchNews();
 setInterval(fetchNews, 300000); // Оновлення кожні 5 хвилин
 
