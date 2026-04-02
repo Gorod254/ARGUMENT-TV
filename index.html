@@ -13,6 +13,7 @@
         #digital-clock { font-family: monospace; font-size: 18px; color: var(--red); font-weight: bold; }
         .menu-btn { background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; }
 
+        /* ЧОРНИЙ БЛОК ВАЛЮТ З ПРАПОРАМИ */
         .currency-bar { 
             background: #0a0a0a; 
             padding: 12px 15px; 
@@ -90,7 +91,7 @@
                     <option value="Kodyma">Кодима</option>
                     <option value="Ananiv">Ананьїв</option>
                 </select>
-                <div id="w-desc" style="margin-top:5px; color:#888;">Завантаження...</div>
+                <div id="w-desc" style="margin-top:5px; color:#888;">Зараз у місті</div>
             </div>
             <div class="temp" id="w-temp">--°C</div>
         </div>
@@ -108,14 +109,29 @@
     <div style="text-align: right; margin-bottom: 20px;"><span onclick="document.getElementById('sideMenu').classList.remove('active')" style="cursor:pointer; color:var(--red); font-size:24px;">✕</span></div>
     <div class="menu-link" onclick="showJoke()">🎭 АНЕКДОТ ДНЯ</div>
     <a href="https://alerts.in.ua/" target="_blank" class="menu-link">🗺️ КАРТА ТРИВОГ</a>
-    <div class="menu-link" onclick="location.reload()">🔄 ОНОВИТИ СТОРІНКУ</div>
+    <div class="menu-link" onclick="location.reload()">🔄 ОНОВИТИ</div>
 </div>
 
 <footer><p>АРГУМЕНТ TV — 2026</p></footer>
 
 <script>
+// --- ПОТІК ТРАНСЛЯЦІЇ ---
+const streamUrls = [
+    'https://stream.suspilne.media/hls/news/index.m3u8' // РОБОЧИЙ ПОТІК (СУСПІЛЬНЕ)
+];
+
 const v = document.getElementById('video');
-const streamUrl = 'https://stream.suspilne.media/hls/culture/index.m3u8'; // Стабільне джерело
+
+function initPlayer() {
+    if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(streamUrls[0]);
+        hls.attachMedia(v);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => v.play().catch(() => {}));
+    } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
+        v.src = streamUrls[0];
+    }
+}
 
 // ГОДИННИК
 setInterval(() => {
@@ -133,34 +149,6 @@ async function updateCurrency() {
         });
     } catch(e) {}
 }
-
-// ПЛЕЄР (РЕМОНТ)
-function initPlayer() {
-    if (Hls.isSupported()) {
-        const hls = new Hls({
-            manifestLoadingMaxRetry: 5,
-            levelLoadingMaxRetry: 5,
-            enableWorker: true
-        });
-        hls.loadSource(streamUrl);
-        hls.attachMedia(v);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => v.play().catch(() => {}));
-        
-        hls.on(Hls.Events.ERROR, (event, data) => {
-            if (data.fatal) {
-                hls.destroy();
-                setTimeout(initPlayer, 2000);
-            }
-        });
-    } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
-        v.src = streamUrl;
-    }
-}
-
-// Перевірка зависання
-setInterval(() => {
-    if (v.paused && v.readyState === 0) initPlayer();
-}, 5000);
 
 // ПОГОДА
 async function updateWeather(city) {
@@ -200,8 +188,7 @@ async function fetchNews() {
 function showJoke() {
     const jokes = [
         "Купив собаку, назвав 'Приват'. Тепер він постійно просить оновити дані і гавкає на відсотки.",
-        "Оголошення: 'Шукаю роботу. Можу працювати як сонячна батарея: вдень стою на місці, ввечері відключаюся'.",
-        "Син питає батька: 'Тату, а як працює інтернет?' — 'Ну, синку, це як бібліотека, тільки книги розкидані по всій квартирі, і кожна друга — про котів'.",
+        "Одеса. Дружина — чоловікові: — Моня, ти бачив цей курс долара? — Сара, я тебе благаю, не дивись на ніч ужастики!",
         "Досвідчений програміст — це той, хто перед тим, як сісти на стілець, натискає на нього правою кнопкою миші."
     ];
     alert(jokes[Math.floor(Math.random() * jokes.length)]);
