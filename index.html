@@ -10,51 +10,30 @@
         body { background: var(--dark); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
 
         header { background: var(--dark); padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--red); position: sticky; top: 0; z-index: 1000; }
-        #digital-clock { font-family: monospace; font-size: 18px; color: #ffffff; font-weight: bold; }
+        #digital-clock { font-family: monospace; font-size: 18px; color: var(--red); font-weight: bold; }
         .menu-btn { background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; }
 
-        /* ЧОРНИЙ БЛОК ВАЛЮТ З ПРАПОРАМИ */
-        .currency-bar { 
-            background: #0a0a0a; 
-            padding: 12px 15px; 
-            display: flex; 
-            justify-content: center; 
-            gap: 20px;
-            border-bottom: 1px solid #222;
-            flex-wrap: wrap;
-        }
-        .curr-item { 
-            font-size: 14px; 
-            font-weight: bold; 
-            color: #888; 
-            display: flex; 
-            align-items: center; 
-            gap: 6px;
-        }
+        .currency-bar { background: #0a0a0a; padding: 12px 15px; display: flex; justify-content: center; gap: 20px; border-bottom: 1px solid #222; flex-wrap: wrap; }
+        .curr-item { font-size: 14px; font-weight: bold; color: #888; display: flex; align-items: center; gap: 6px; }
         .curr-item span { color: #fff; font-size: 15px; }
 
         .container { max-width: 850px; margin: 0 auto; padding: 15px; }
-
         .player-box { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid #222; margin-bottom: 20px; }
-        video { width: 100%; height: 100%; display: block; object-fit: contain; background: #000; }
-        .player-logo { position: absolute; top: 12px; right: 12px; width: 60px; z-index: 10; opacity: 0.8; pointer-events: none; }
+        video { width: 100%; height: 100%; display: block; object-fit: contain; }
 
         .section-title { font-size: 13px; text-transform: uppercase; color: var(--red); font-weight: bold; margin: 25px 0 10px; display: block; border-left: 3px solid var(--red); padding-left: 10px; }
-        
         .weather-card { background: var(--gray); border: 1px solid #222; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
         .weather-main { display: flex; justify-content: space-between; align-items: center; }
         .temp { font-size: 32px; font-weight: bold; color: var(--red); }
-        select { background: #1a1a1a; color: #fff; border: 1px solid var(--red); padding: 8px; border-radius: 6px; font-size: 16px; outline: none; }
+        select { background: #1a1a1a; color: #fff; border: 1px solid var(--red); padding: 8px; border-radius: 6px; outline: none; }
 
-        #news-container { background: #050505; border-radius: 12px; height: 500px; overflow-y: auto; border: 1px solid #1a1a1a; }
+        #news-container { background: #050505; border-radius: 12px; height: 400px; overflow-y: auto; border: 1px solid #1a1a1a; }
         .news-item { display: block; padding: 15px; border-bottom: 1px solid #1a1a1a; text-decoration: none; color: white; }
         .news-meta { font-size: 11px; color: var(--red); font-weight: bold; margin-bottom: 4px; }
 
         .side-menu { position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: var(--gray); z-index: 2000; transition: 0.3s; padding: 20px; border-right: 2px solid var(--red); }
         .side-menu.active { left: 0; }
         .menu-link { display: block; padding: 15px; color: #fff; text-decoration: none; border-bottom: 1px solid #222; font-weight: bold; cursor: pointer; }
-
-        footer { padding: 25px; text-align: center; font-size: 11px; color: #444; }
     </style>
 </head>
 <body>
@@ -77,7 +56,6 @@
 
 <div class="container">
     <div class="player-box">
-        <img src="logo.png" class="player-logo">
         <video id="video" controls autoplay playsinline muted></video>
     </div>
 
@@ -91,13 +69,9 @@
                     <option value="Kodyma">Кодима</option>
                     <option value="Ananiv">Ананьїв</option>
                 </select>
-                <div id="w-desc" style="margin-top:5px; color:#888;">Зараз у місті</div>
+                <div id="w-desc" style="margin-top:5px; color:#888;">Завантаження...</div>
             </div>
             <div class="temp" id="w-temp">--°C</div>
-        </div>
-        <div style="display:flex; gap:15px; margin-top:10px; font-size:13px; color:#888; border-top:1px solid #222; padding-top:10px;">
-            <span>💨 Вітер: <b id="w-wind">--</b> км/год</span>
-            <span>💧 Вологість: <b>~60%</b></span>
         </div>
     </div>
 
@@ -109,99 +83,81 @@
     <div style="text-align: right; margin-bottom: 20px;"><span onclick="document.getElementById('sideMenu').classList.remove('active')" style="cursor:pointer; color:var(--red); font-size:24px;">✕</span></div>
     <div class="menu-link" onclick="showJoke()">🎭 АНЕКДОТ ДНЯ</div>
     <a href="https://alerts.in.ua/" target="_blank" class="menu-link">🗺️ КАРТА ТРИВОГ</a>
-    <div class="menu-link" onclick="location.reload()">🔄 ОНОВИТИ</div>
 </div>
 
-<footer><p>АРГУМЕНТ TV — 2026</p></footer>
-
 <script>
-// --- ПОТІК ТРАНСЛЯЦІЇ ---
-const streamUrls = [
-    'https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8' // РОБОЧИЙ ПОТІК (СУСПІЛЬНЕ)
-];
-
-const v = document.getElementById('video');
-
-function initPlayer() {
-    if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(streamUrls[0]);
-        hls.attachMedia(v);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => v.play().catch(() => {}));
-    } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
-        v.src = streamUrls[0];
-    }
-}
-
 // ГОДИННИК
-setInterval(() => {
+function updateClock() {
     document.getElementById('digital-clock').textContent = new Date().toLocaleTimeString('uk-UA');
-}, 1000);
+}
+setInterval(updateClock, 1000);
+updateClock();
 
-// КУРС ВАЛЮТ
+// ВАЛЮТА
 async function updateCurrency() {
     try {
         const r = await fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json');
         const d = await r.json();
-        const targets = { 'USD': 'rate-USD', 'EUR': 'rate-EUR', 'GBP': 'rate-GBP', 'PLN': 'rate-PLN', 'MDL': 'rate-MDL' };
-        d.forEach(i => {
-            if(targets[i.cc]) document.getElementById(targets[i.cc]).textContent = i.rate.toFixed(2);
-        });
-    } catch(e) {}
+        const t = { 'USD': 'rate-USD', 'EUR': 'rate-EUR', 'GBP': 'rate-GBP', 'PLN': 'rate-PLN', 'MDL': 'rate-MDL' };
+        d.forEach(i => { if(t[i.cc]) document.getElementById(t[i.cc]).textContent = i.rate.toFixed(2); });
+    } catch(e) { console.error("Валюта не завантажилась"); }
 }
+updateCurrency();
+
+// ПЛЕЄР (Суспільне)
+const v = document.getElementById('video');
+const streamUrl = 'https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8';
+function initPlayer() {
+    if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(streamUrl);
+        hls.attachMedia(v);
+    } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
+        v.src = streamUrl;
+    }
+}
+initPlayer();
 
 // ПОГОДА
 async function updateWeather(city) {
     const coords = { "Balta": {lat: 47.93, lon: 29.62}, "Podilsk": {lat: 47.74, lon: 29.53}, "Kodyma": {lat: 48.09, lon: 29.12}, "Ananiv": {lat: 47.72, lon: 29.96} };
     const c = coords[city];
     try {
-        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&current_weather=true&windspeed_10m=true`);
+        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&current_weather=true`);
         const d = await r.json();
-        const states = { 0: "Ясно ☀️", 1: "Переважно ясно", 2: "Мінлива хмарність ⛅", 3: "Похмуро ☁️", 61: "Дощ 🌧️" };
-        document.getElementById('w-temp').textContent = (d.current_weather.temperature > 0 ? "+" : "") + Math.round(d.current_weather.temperature) + "°C";
+        const states = { 0: "Ясно ☀️", 1: "Переважно ясно", 2: "Хмарно ⛅", 3: "Похмуро ☁️", 61: "Дощ 🌧️" };
+        document.getElementById('w-temp').textContent = Math.round(d.current_weather.temperature) + "°C";
         document.getElementById('w-desc').textContent = states[d.current_weather.weathercode] || "Хмарно";
-        document.getElementById('w-wind').textContent = d.current_weather.windspeed;
     } catch(e) {}
 }
+updateWeather("Balta");
+document.getElementById('city-select').onchange = (e) => updateWeather(e.target.value);
 
-// НОВИНИ
-async function fetchNews() {
-    const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
-    const sources = ["https://tsn.ua/rss/full.rss", "https://www.pravda.com.ua/rss/", "https://24tv.ua/rss/all.xml"];
-    let all = [];
-    for (let url of sources) {
-        try {
-            const r = await fetch(`${proxy}${encodeURIComponent(url)}&t=${Date.now()}`);
-            const d = await r.json();
-            d.items.forEach(i => all.push({t: i.title, l: i.link, d: new Date(i.pubDate), s: d.feed.title.split(' ')[0]}));
-        } catch(e) {}
-    }
-    all.sort((a,b) => b.d - a.d);
-    document.getElementById('news-container').innerHTML = all.slice(0, 40).map(n => `
-        <a href="${n.l}" target="_blank" class="news-item">
-            <div class="news-meta">${n.s} | ${n.d.getHours()}:${String(n.d.getMinutes()).padStart(2,'0')}</div>
-            <div style="font-weight:500;">${n.t}</div>
-        </a>
-    `).join('');
-}
-
+// АНЕКДОТИ (Обов'язково одинарні лапки зовні!)
 function showJoke() {
     const jokes = [
-        const jokes = [
-    
-];
-
+        'Купив собаку, назвав "Приват". Тепер він гавкає на відсотки.',
+        'Одеса. Дружина: "Моня, ти бачив курс долара?" — "Сара, не дивись на ніч ужастики!"',
+        'Програміст перед сном ставить на тумбочку дві склянки: одну з водою (якщо захоче пити), іншу порожню (якщо не захоче).'
     ];
     alert(jokes[Math.floor(Math.random() * jokes.length)]);
 }
 
-// ПУСК
-initPlayer();
-updateCurrency();
-updateWeather("Balta");
+// НОВИНИ
+async function fetchNews() {
+    try {
+        const r = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://tsn.ua/rss/full.rss');
+        const d = await r.json();
+        document.getElementById('news-container').innerHTML = d.items.map(i => `
+            <a href="${i.link}" target="_blank" class="news-item">
+                <div class="news-meta">ТСН</div>
+                <div>${i.title}</div>
+            </a>
+        `).join('');
+    } catch(e) {}
+}
 fetchNews();
-setInterval(fetchNews, 300000);
-document.getElementById('city-select').onchange = (e) => updateWeather(e.target.value);
 </script>
+
 </body>
 </html>
