@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>АРГУМЕНТ TV - Новинний агрегатор</title>
+    <!-- Підключення плеєра Video.js -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #000;
+            --text-color: #fff;
+            --accent-color: #ff0000;
+            --gray-color: #222;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        /* Шапка */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--accent-color);
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            z-index: 100;
+        }
+
+        .left-group { display: flex; align-items: center; }
+
+        .burger-btn {
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 20px;
+            letter-spacing: 1px;
+        }
+
+        .logo span { color: var(--accent-color); }
+
+        #clock { font-family: monospace; font-size: 18px; }
+
+        /* Валюта */
+        .currency-bar {
+            font-size: 11px;
+            padding: 5px;
+            text-align: center;
+            background: var(--gray-color);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        /* Плеєр */
+        .player-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 10px auto;
+            padding: 0 5px;
+        }
+        .video-js { width: 100%; aspect-ratio: 16/9; }
+        .source-label { font-size: 10px; color: #888; margin-top: 4px; }
+
+        /* Погода */
+        .weather-section {
+            padding: 15px;
+            background: #111;
+            margin: 10px;
+            border-radius: 5px;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        select {
+            background: var(--gray-color);
+            color: white;
+            border: 1px solid #444;
+            padding: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        /* Новини */
+        .news-container {
+            padding: 10px;
+        }
+        .news-header {
+            border-bottom: 2px solid var(--accent-color);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .news-list {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 5px;
+        }
+        .news-item {
+            padding: 10px;
+            border-bottom: 1px solid #222;
+            display: block;
+            text-decoration: none;
+            color: #ccc;
+        }
+        .news-item:hover { background: #111; }
+        .news-title { color: var(--text-color); font-weight: bold; display: block; margin-bottom: 3px; }
+        .news-meta { font-size: 10px; color: var(--accent-color); }
+
+        /* Меню */
+        .side-menu {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background: #111;
+            transition: 0.3s;
+            z-index: 200;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(255,0,0,0.2);
+        }
+        .side-menu.active { left: 0; }
+        .menu-item { margin-bottom: 25px; }
+        .menu-item h3 { color: var(--accent-color); border-bottom: 1px solid #333; }
+        .joke-box { font-style: italic; font-size: 14px; }
+
+        /* Футер */
+        footer {
+            padding: 20px;
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #222;
+            margin-top: 20px;
+        }
+
+        .close-menu { float: right; cursor: pointer; font-size: 20px; }
+    </style>
+</head>
+<body>
+
+<!-- Меню -->
+<div id="sideMenu" class="side-menu">
+    <span class="close-menu" onclick="toggleMenu()">✕</span>
+    <div class="menu-item">
+        <h3>Хвилинка гумору</h3>
+        <div id="joke" class="joke-box">Завантаження анекдоту...</div>
+    </div>
+    <div class="menu-item">
+        <h3>Балтська ОТГ</h3>
+        <a href="https://www.facebook.com/share/g/18Eok1LxGM/?mibextid=wwXIfr" target="_blank" style="color:white; text-decoration: none;">Офіційні новини (Facebook)</a>
+    </div>
+</div>
+
+<header>
+    <div class="left-group">
+        <button class="burger-btn" onclick="toggleMenu()">☰</button>
+        <div class="logo">АРГУМЕНТ <span>TV</span></div>
+    </div>
+    <div id="clock">00:00:00</div>
+</header>
+
+<div class="currency-bar" id="currency">
+    Курс НБУ: Завантаження...
+</div>
+
+<div class="player-container">
+    <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" data-setup="{}">
+        <source src="https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8" type="application/x-mpegURL">
+    </video>
+    <div class="source-label">контент НСТУ</div>
+</div>
+
+<div class="weather-section">
+    <select id="citySelect" onchange="updateWeather()">
+        <option value="Balta">Балта</option>
+        <option value="Podilsk">Подільськ</option>
+        <option value="Kodyma">Кодима</option>
+        <option value="Ananiv">Ананьїв</option>
+        <option value="Liubashivka">Любашівка</option>
+        <option value="Savran">Саврань</option>
+        <option value="Pishchana">Піщана</option>
+        <option value="Zelenohirske">Зеленогірське</option>
+        <option value="Slobidka">Слобідка</option>
+        <option value="Okny">Окни</option>
+    </select>
+    <div id="weather-data">
+        Завантаження погоди...
+    </div>
+</div>
+
+<div class="news-container">
+    <div class="news-header">
+        <span>СТРІЧКА НОВИН</span>
+        <small id="news-status" style="color: #555;">оновлюється...</small>
+    </div>
+    <div id="news-list" class="news-list">
+        <!-- Новини з'являться тут -->
+    </div>
+</div>
+
+<footer>
+    Аргумент TV є агрегатором новин. Проєкт не комерційний. <br>
+    Весь аудіовізуальний контент належить законним представникам: <br>
+    Національна Суспільна Телерадіокомпанія України. <br>
+    <strong>2026 рік</strong>
+</footer>
+
+<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+<script>
+    // Годинник
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toLocaleTimeString('uk-UA');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Меню
+    function toggleMenu() {
+        document.getElementById('sideMenu').classList.toggle('active');
+    }
+
+    // Курс валют (NBU API)
+    async function getCurrency() {
+        try {
+            const res = await fetch('https://bank.gov.ua/NBUStatService/v1/statistichny-dan-v-format-json?json');
+            const data = await res.json();
+            const codes = ['USD', 'EUR', 'GBP', 'PLN', 'MDL'];
+            let html = 'Курс НБУ: ';
+            data.filter(x => codes.includes(x.cc)).forEach(c => {
+                html += `<b>${c.cc}</b>: ${c.rate.toFixed(2)}грн | `;
+            });
+            document.getElementById('currency').innerHTML = html;
+        } catch {
+            document.getElementById('currency').innerText = 'Помилка завантаження валют';
+        }
+    }
+    getCurrency();
+
+    // Погода (Open-Meteo - безкоштовне API без ключів)
+    async function updateWeather() {
+        const city = document.getElementById('citySelect').value;
+        // Координати (приблизні для регіону)
+        const coords = { 'Balta': [47.93, 29.62], 'Podilsk': [47.74, 29.53], 'Kodyma': [48.09, 29.12] };
+        const [lat, lon] = coords[city] || [47.93, 29.62];
+        
+        try {
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m&wind_speed_unit=ms`);
+            const data = await res.json();
+            const c = data.current;
+            
+            document.getElementById('weather-data').innerHTML = `
+                <b>${c.temperature_2m}°C</b> (відчувається як ${c.apparent_temperature}°C) <br>
+                Вологість: ${c.relative_humidity_2m}% | Тиск: ${Math.round(c.pressure_msl * 0.750062)} мм рт.ст. <br>
+                Вітер: ${c.wind_speed_10m} м/с | Хмарність: ${c.cloud_cover}%
+            `;
+        } catch {
+            document.getElementById('weather-data').innerText = 'Помилка погоди';
+        }
+    }
+    updateWeather();
+
+    // Новини (RSS Агрегатор через RSS2JSON)
+    async function fetchNews() {
+        const feeds = [
+            'https://www.pravda.com.ua/rss/',
+            'https://suspilne.media/rss/9.xml',
+            'https://tsn.ua/rss/full.rss'
+        ];
+        
+        const container = document.getElementById('news-list');
+        container.innerHTML = '';
+
+        for (let url of feeds) {
+            try {
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+                data.items.slice(0, 5).forEach(item => {
+                    const el = document.createElement('a');
+                    el.className = 'news-item';
+                    el.href = item.link;
+                    el.target = '_blank';
+                    el.innerHTML = `
+                        <span class="news-meta">${data.feed.title}</span>
+                        <span class="news-title">${item.title}</span>
+                        <span style="font-size:10px">${new Date(item.pubDate).toLocaleTimeString()}</span>
+                    `;
+                    container.appendChild(el);
+                });
+            } catch (e) { console.log("RSS error", e); }
+        }
+    }
+    fetchNews();
+    setInterval(fetchNews, 300000); // Оновлення кожні 5 хв
+
+    // Анекдот
+    async function getJoke() {
+        // Оскільки API анекдотів українською мало, використаємо статичний масив для надійності або випадковий вибір
+        const jokes = [
+            "Приходить син залізничника додому: — Тату, я школу закінчив! — Ну, синку, тепер ти вільний як порожній вагон!",
+            "У залізничній касі: — Мені квиток до Балти. — Вам купе чи плацкарт? — Мені щоб швидше!",
+            "Новини: Вчені виявили, що людина на 80% складається з води, а мешканець Балти ще на 20% з оптимізму."
+        ];
+        document.getElementById('joke').innerText = jokes[Math.floor(Math.random() * jokes.length)];
+    }
+    getJoke();
+</script>
+
+</body>
+</html>
