@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>АРГУМЕНТ LIVE</title>
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #000;
+            --text-color: #fff;
+            --accent-color: #ff0000;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* Шапка */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: #111;
+            border-bottom: 1px solid var(--accent-color);
+            height: 50px;
+        }
+
+        .logo { font-weight: bold; font-size: 18px; text-transform: uppercase; }
+        .logo span { color: var(--accent-color); }
+        #clock { font-family: monospace; font-size: 16px; color: #fff; }
+
+        /* Бургер меню */
+        .burger-btn {
+            font-size: 28px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 0;
+            margin: 0;
+        }
+
+        .side-menu {
+            position: fixed;
+            left: -100%;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: #0a0a0a;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            padding-top: 70px;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        }
+
+        .side-menu.active { left: 0; }
+
+        .menu-content { padding: 20px; }
+        .menu-item { margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 15px; }
+        .menu-item h3 { color: var(--accent-color); margin-top: 0; font-size: 16px; text-transform: uppercase; }
+
+        /* Валюта */
+        .currency-bar {
+            background: #1a1a1a;
+            padding: 8px;
+            font-size: 12px;
+            text-align: center;
+            white-space: nowrap;
+            overflow-x: auto;
+            border-bottom: 1px solid #333;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Відео */
+        .player-box { width: 100%; background: #000; }
+        .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9; }
+        .nst-label { padding: 5px 15px; font-size: 10px; color: #666; }
+
+        /* Погода */
+        .weather-card {
+            margin: 10px;
+            padding: 15px;
+            background: #111;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            -webkit-appearance: none; /* Для iPhone style */
+        }
+
+        /* Новини */
+        .news-section { margin: 10px; }
+        .news-title-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .news-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .news-card {
+            display: block;
+            text-decoration: none;
+            background: #0a0a0a;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #222;
+            border-radius: 4px;
+        }
+        .news-card:active { background: #1a1a1a; } /* Ефект натискання */
+        
+        .source-tag { font-size: 10px; color: var(--accent-color); font-weight: bold; text-transform: uppercase; }
+        .item-text { display: block; color: #fff; font-size: 14px; margin: 5px 0; line-height: 1.3; }
+        .item-time { font-size: 10px; color: #555; }
+
+        footer {
+            padding: 20px;
+            font-size: 11px;
+            text-align: center;
+            color: #444;
+            background: #050505;
+            margin-top: auto;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+        }
+        .overlay.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+
+<div id="sideMenu" class="side-menu">
+    <div class="menu-content">
+        <div class="menu-item">
+            <h3>Анекдот дня</h3>
+            <div id="joke-box" style="font-size: 14px; line-height: 1.4; color: #ccc;">Завантаження...</div>
+        </div>
+        <div class="menu-item">
+            <h3>Балтська ОТГ</h3>
+            <a href="https://www.facebook.com/share/g/18Eok1LxGM/?mibextid=wwXIfr" target="_blank" style="color:#3b5998; text-decoration: none; font-weight: bold; font-size: 14px;">Офіційні новини (Facebook)</a>
+        </div>
+    </div>
+</div>
+
+<header>
+    <div style="display:flex; align-items:center;">
+        <button class="burger-btn" onclick="toggleMenu()">☰</button>
+        <div class="logo" style="margin-left:12px;">АРГУМЕНТ <span>LIVE</span></div>
+    </div>
+    <div id="clock">00:00:00</div>
+</header>
+
+<div class="currency-bar" id="currency">
+    Завантаження курсів НБУ...
+</div>
+
+<div class="player-box">
+    <video id="vid1" class="video-js vjs-default-skin vjs-big-play-centered vjs-16-9" controls preload="auto" width="auto" height="auto">
+        <source src="https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8" type="application/x-mpegURL">
+    </video>
+    <div class="nst-label">підпис контент НСТУ</div>
+</div>
+
+<div class="weather-card">
+    <select id="citySelect" onchange="updateWeather()">
+        <option value="Balta">Балта</option>
+        <option value="Podilsk">Подільськ</option>
+        <option value="Kodyma">Кодима</option>
+        <option value="Ananiv">Ананьїв</option>
+        <option value="Liubashivka">Любашівка</option>
+        <option value="Savran">Саврань</option>
+        <option value="Pishchana">Піщана</option>
+        <option value="Zelenohirske">Зеленогірське</option>
+        <option value="Slobidka">Слобідка</option>
+        <option value="Okny">Окни</option>
+    </select>
+    <div id="weather-info">Оновлення погоди...</div>
+</div>
+
+<div class="news-section">
+    <div class="news-title-top">
+        <span style="font-weight:bold; font-size:14px; text-transform: uppercase;">СТРІЧКА НОВИН</span>
+        <span id="news-timer" style="font-size:10px; color:#444;">оновлено щойно</span>
+    </div>
+    <div class="news-scroll" id="news-feed">
+        <div style="text-align:center; padding:20px; color:#444; font-size: 12px;">Завантаження стрічки...</div>
+    </div>
+</div>
+
+<footer>
+    Аргумент LIVE є агрегатором новин. Проєкт не комерційний.<br>
+    Весь аудіовізуальний контент належить законним представникам: Національна Суспільна Телерадіокомпанія України. <br>
+    <strong>2026 рік</strong>
+</footer>
+
+<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+<script>
+    // 1. Годинник
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString('uk-UA');
+    }, 1000);
+
+    // 2. Меню
+    function toggleMenu() {
+        document.getElementById('sideMenu').classList.toggle('active');
+        document.getElementById('overlay').classList.toggle('active');
+    }
+
+    // 3. Валюта (Використано rss2json як надійний проксі)
+    async function fetchCurrency() {
+        try {
+            // Запит через проксі rss2json, який добре працює на iPhone
+            const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://bank.gov.ua/NBUStatService/v1/statistichny-dan-v-format-json?json'));
+            const resData = await response.json();
+            
+            // Якщо проксі повернув помилку
+            if (resData.status !== 'ok') throw new Error('Proxy error');
+
+            // Парсимо JSON вміст, який повернув проксі
+            const data = JSON.parse(resData.feed.description); 
+            
+            const needed = {'USD':'$', 'EUR':'€', 'PLN':'zl', 'GBP':'£'};
+            let str = "";
+            data.forEach(item => {
+                if(needed[item.cc]) {
+                    str += `${needed[item.cc]} ${item.rate.toFixed(2)} | `;
+                }
+                if(item.cc === 'MDL') str += `MDL ${item.rate.toFixed(2)} | `;
+            });
+            document.getElementById('currency').innerHTML = "НБУ: " + str.slice(0, -3);
+        } catch (e) {
+            console.error("Currency error:", e);
+            document.getElementById('currency').innerText = "Курс тимчасово недоступний (CORS)";
+        }
+    }
+    fetchCurrency();
+
+    // 4. Погода
+    async function updateWeather() {
+        const city = document.getElementById('citySelect').value;
+        const coords = { 
+            'Balta': [47.93, 29.62], 'Podilsk': [47.74, 29.53], 'Kodyma': [48.09, 29.12],
+            'Ananiv': [47.72, 29.96], 'Liubashivka': [47.83, 30.25], 'Savran': [48.13, 30.08],
+            'Pishchana': [48.03, 29.74], 'Zelenohirske': [47.84, 30.22], 'Slobidka': [47.88, 29.35], 'Okny': [47.53, 29.45]
+        };
+        const [lat, lon] = coords[city];
+        try {
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,surface_pressure,wind_speed_10m&wind_speed_unit=ms`);
+            const data = await res.json();
+            const c = data.current;
+            const codes = {0:'Ясно', 1:'Переважно ясно', 2:'Мінлива хмарність', 3:'Хмарно', 45:'Туман', 61:'Невеликий дощ', 63:'Дощ', 71:'Сніг', 95:'Гроза'};
+            
+            document.getElementById('weather-info').innerHTML = `
+                <div style="font-size:22px; font-weight:bold; margin-bottom:5px;">${c.temperature_2m}°C <span style="font-size:14px; font-weight:normal;">(${codes[c.weather_code] || 'Опади'})</span></div>
+                <div style="font-size:12px; color:#aaa;">
+                    Вітер: ${c.wind_speed_10m} м/с | Вологість: ${c.relative_humidity_2m}% <br>
+                    Тиск: ${Math.round(c.surface_pressure * 0.750062)} мм рт.ст.
+                </div>
+            `;
+        } catch (e) { document.getElementById('weather-info').innerText = "Помилка оновлення погоди"; }
+    }
+    updateWeather();
+
+    // 5. Новини (Агрегація з різних джерел через RSS проксі rss2json)
+    async function loadNews() {
+        const rssFeeds = [
+            {n: 'УП', u: 'https://www.pravda.com.ua/rss/'},
+            {n: 'ТСН', u: 'https://tsn.ua/rss/full.rss'},
+            {n: '24 Канал', u: 'https://24tv.ua/rss/allNews.xml'},
+            {n: 'Суспільне', u: 'https://suspilne.media/rss/9.xml'},
+            {n: 'УНІАН', u: 'https://rss.unian.net/site/ukr/news/1'}
+        ];
+        
+        const feedContainer = document.getElementById('news-feed');
+        let allArticles = [];
+
+        for(let feed of rssFeeds) {
+            try {
+                // Кожну стрічку запитуємо через api.rss2json.com
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.u)}`);
+                const data = await res.json();
+                if(data.items && data.status === 'ok') {
+                    data.items.forEach(item => {
+                        allArticles.push({
+                            title: item.title,
+                            link: item.link,
+                            time: new Date(item.pubDate),
+                            source: feed.n
+                        });
+                    });
+                }
+            } catch (e) { console.warn("RSS error on " + feed.n); }
+        }
+
+        // Сортування за часом (найновіші зверху)
+        allArticles.sort((a, b) => b.time - a.time);
+        
+        if (allArticles.length === 0) {
+            feedContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#444; font-size: 12px;">Помилка завантаження новин. Спробуйте пізніше.</div>';
+            return;
+        }
+
+        feedContainer.innerHTML = '';
+        allArticles.slice(0, 40).forEach(a => {
+            const timeStr = a.time.toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'});
+            feedContainer.innerHTML += `
+                <a href="${a.link}" target="_blank" class="news-card">
+                    <span class="source-tag">${a.source}</span>
+                    <span class="item-text">${a.title}</span>
+                    <span class="item-time">${timeStr}</span>
+                </a>
+            `;
+        });
+        document.getElementById('news-timer').innerText = "оновлено: " + new Date().toLocaleTimeString();
+    }
+    loadNews();
+    setInterval(loadNews, 300000); // 5 хв
+
+    // 6. Анекдоти (локальна база)
+    const jokes = [
+        "— Куме, а ви знаєте, що в Балті відкрили новий ресторан? — І як там? — Не знаю, я ще з минулого не повернувся!",
+        "Залізниця. Провідник: — Чай, кава, новини з Фейсбуку?",
+        "Приходить чоловік у мерію: — Я хочу у вас працювати. — Ви що, з глузду з'їхали? — А це обов'язкова умова?",
+        "— Алло, це Балтська ОТГ? — Так. — А чому у вас новини такі гарні? — Не подобається — не читайте, ми самі в шоці!",
+        "Вчителька в школі: — Діти, хто знає, де знаходиться Кодима? Вовочка: — Там, де й завжди, пані вчителько, нікуди не переїжджала!"
+    ];
+    document.getElementById('joke-box').innerText = jokes[Math.floor(Math.random()*jokes.length)];
+
+    // Ініціалізація плеєра Video.js з адаптивністю 16:9
+    var player = videojs('vid1');
+</script>
+
+</body>
+</html>
