@@ -1,182 +1,100 @@
-alert("Сайт працює!");
+/* --- BURGER MENU --- */
+function toggleMenu(){
+    document.getElementById("menu")
+        .classList.toggle("open");
+}
 
-// --- КОНФІГУРАЦІЯ ---
-const RSS_SOURCES = {
-    "УП": "https://www.pravda.com.ua/rss/",
-    "Громадське": "https://hromadske.ua/rss",
-    "Суспільне": "https://suspilne.media/rss/99.rss",
-    "Думська": "https://dumskaya.net/rssnews.xml",
-    "24 Канал": "https://24tv.ua/rss/allNews.xml",
-    "Південь Сьогодні": "https://yug.today/feed/"
-};
+/* --- CLOCK --- */
+function updateClock(){
+    let now = new Date();
+    let clock = document.getElementById("clock");
+    clock.innerHTML = now.toLocaleTimeString("uk-UA");
+}
+setInterval(updateClock, 1000);
 
-const weatherCoords = {
-    "Balta": {lat: 47.93, lon: 29.62},
-    "Podilsk": {lat: 47.74, lon: 29.53},
-    "Kodyma": {lat: 48.09, lon: 29.12},
-    "Ananiv": {lat: 47.72, lon: 29.96},
-    "Liubashivka": {lat: 47.83, lon: 30.25},
-    "Savran": {lat: 48.13, lon: 30.08},
-    "Pishchana": {lat: 48.20, lon: 29.75},
-    "Zelenogirske": {lat: 47.84, lon: 30.22},
-    "Slobidka": {lat: 47.88, lon: 29.35},
-    "Okny": {lat: 47.53, lon: 29.46}
-};
+/* --- NBU CURRENCY --- */
+async function loadCurrency(){
+    try {
+        let res = await fetch("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json");
+        let data = await res.json();
+        let symbols = {EUR:'Євро',USD:'Долар',GBP:'Фунт',PLN:'Злотий',MDL:'Молдавський лей'};
+        let output = "Курс НБУ: ";
+        for(let c in symbols){
+            let found = data.find(x=>x.cc === c);
+            if(found) output += `${symbols[c]} ${found.rate.toFixed(2)} | `;
+        }
+        document.getElementById("currency").innerText = output;
+    } catch { }
+}
+loadCurrency();
+setInterval(loadCurrency, 1000*60*10);
 
-const jokes = [
-    "Новини: Сьогодні в Подільському районі було настільки сонячно, що навіть погода в смартфоні заплющила очі.",
-    "Балтські новини: Вчора на площі знайшли гаманець. Господарю прохання не турбувати, ми вже купили радіоприймач!",
-    "— Куме, ви чули, що Аргумент TV тепер показує новини кожні 5 хвилин? — Чув, тепер я не встигаю навіть каву допити, як новини змінюються!"
+/* --- VIDEO PLAYER --- */
+let video = document.getElementById("video");
+let videoSrc = "https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8";
+if(Hls.isSupported()){
+    let hls = new Hls();
+    hls.loadSource(videoSrc);
+    hls.attachMedia(video);
+}
+
+/* --- WEATHER --- */
+const cities = ["Балта","Подільськ","Кодима","Ананьїв","Любашівка",
+"Саврань","Піщана","Зеленогірське","Слобідка","Окни"];
+
+let citySelect = document.getElementById("citySelect");
+cities.forEach(c=>{
+    citySelect.innerHTML += `<option>${c}</option>`;
+});
+
+const weatherKey = "<<<YOUR_OPENWEATHERMAP_KEY_HERE>>>";
+citySelect.onchange = loadWeather;
+
+async function loadWeather(){
+    let city = citySelect.value;
+    let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=uk&appid=${weatherKey}`);
+    let d = await res.json();
+    if(d.main){
+        document.getElementById("weatherInfo").innerHTML =
+        `${d.weather[0].description.toUpperCase()}, 🌡 ${d.main.temp}°C, `+
+        `💧 Вологість ${d.main.humidity}%, 💨 Вітер ${d.wind.speed}м/с, `+
+        `🧭 Тиск ${d.main.pressure} гПа`;
+    }
+}
+loadWeather();
+
+/* --- JOKE (Анекдот) --- */
+function loadJoke(){
+    fetch("https://v2.jokeapi.dev/joke/Any?lang=uk")
+    .then(r=>r.json())
+    .then(j=>{
+        let txt = j.setup ? j.setup + "<br><i>"+ j.delivery+"</i>" : j.joke;
+        document.getElementById("joke").innerHTML = txt;
+    });
+}
+loadJoke();
+
+/* --- NEWS RSS --- */
+const newsFeeds = [
+    "https://rss.unian.net/feed/allnews.rss",
+    "https://gromadske.ua/rss",
+    "https://24tv.ua/rss",
+    "https://tsn.ua/rss",
+    "https://dumska.com/feed/"
 ];
 
-// --- ФУНКЦІЇ ---
+const rssApi = "https://api.rss2json.com/v1/api.json?rss_url=";
 
-// 1. Годинник
-function updateClock() {
-    const el = document.getElementById('digital-clock');
-    if(el) el.textContent = new Date().toLocaleTimeString('uk-UA', { hour12: false });
-}
-
-// 2. Валюти (НБУ)
-async function fetchCurrency() {
-    try {
-        const resp = await fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json');
-        const data = await resp.json();
-        const codes = ['USD', 'EUR', 'GBP', 'PLN', 'MDL'];
-        let text = "Курс НБУ: ";
-        data.filter(i => codes.includes(i.cc)).forEach(i => {
-            text += `${i.cc}: ${i.rate.toFixed(2)} | `;
-        });
-        document.querySelector('.currency-bar marquee').textContent = text;
-    } catch(e) { console.error("Currency error"); }
-}
-
-// 3. Погода
-async function updateWeather(city) {
-    const c = weatherCoords[city];
-    try {
-        const resp = await fetch(`https://www.7timer.info/bin/api.pl?lon=${c.lon}&lat=${c.lat}&product=civil&output=json`);
-        const data = await resp.json();
-        const cur = data.dataseries[0];
-        document.querySelector('.temp').textContent = `${cur.temp2m}°C`;
-        const states = { "clearday": "Ясно", "pcloudy": "Мінлива хмарність", "mcloudy": "Хмарно", "cloudy": "Пасмурно", "rain": "Дощ", "snow": "Сніг" };
-        document.querySelector('.desc').textContent = states[cur.weather] || cur.weather;
-    } catch(e) { document.querySelector('.desc').textContent = "Помилка"; }
-}
-
-// 4. Новини з архівом 8 годин
-async function fetchNews() {
-    const container = document.getElementById('news-container');
-    let allNews = [];
-    const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
-
-    for (let [name, url] of Object.entries(RSS_SOURCES)) {
-        try {
-            const resp = await fetch(proxy + encodeURIComponent(url));
-            const data = await resp.json();
-            if (data.items) {
-                data.items.forEach(item => {
-                    allNews.push({
-                        title: item.title,
-                        link: item.link,
-                        time: new Date(item.pubDate.replace(/-/g, "/")),
-                        source: name
-                    });
-                });
-            }
-        } catch (e) { console.log(name + " error"); }
-    }
-
-    allNews.sort((a, b) => b.time - a.time);
-    const limit = new Date(Date.now() - 8 * 60 * 60 * 1000);
-    const filtered = allNews.filter(n => n.time > limit);
-
-    container.innerHTML = filtered.map(n => `
-        <a href="${n.link}" target="_blank" class="news-item">
-            <span class="news-source">${n.source}</span>
-            <span class="news-time">${n.time.getHours()}:${String(n.time.getMinutes()).padStart(2, '0')}</span>
-            <div class="news-title" style="font-weight:bold; margin-top:5px;">${n.title}</div>
-        </a>
-    `).join('');
-}
-
-// 5. НАЛАШТУВАННЯ ПЛЕЄРА (ВИПРАВЛЕНО)
-const v = document.getElementById('video');
-const m3u8Url = 'https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8';
-
-function initPlayer() {
-    if (Hls.isSupported()) {
-        const hls = new Hls({
-            debug: false,
-            lowLatencyMode: true,
-        });
-        hls.loadSource(m3u8Url);
-        hls.attachMedia(v);
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
-            v.play().catch(() => {
-                console.log("Автозапуск заблоковано, очікуємо кліку");
-            });
-        });
-        
-        // Якщо потік обірвався - перепідключаємось
-        hls.on(Hls.Events.ERROR, function (event, data) {
-            if (data.fatal) {
-                switch(data.type) {
-                    case Hls.ErrorTypes.NETWORK_ERROR:
-                        hls.startLoad();
-                        break;
-                    case Hls.ErrorTypes.MEDIA_ERROR:
-                        hls.recoverMediaError();
-                        break;
-                    default:
-                        initPlayer();
-                        break;
-                }
-            }
-        });
-    } 
-    // Для Safari (iPhone/Mac), де HLS підтримується нативно
-    else if (v.canPlayType('application/vnd.apple.mpegurl')) {
-        v.src = m3u8Url;
-        v.addEventListener('loadedmetadata', function() {
-            v.play();
+async function loadNews(){
+    let ticker = document.getElementById("newsTicker");
+    ticker.innerHTML = "";
+    for(let feed of newsFeeds){
+        let res = await fetch(rssApi + encodeURIComponent(feed));
+        let data = await res.json();
+        data.items.slice(0,5).forEach(item=>{
+            ticker.innerHTML += `<a href="${item.link}" target="_blank">${item.title}</a>`;
         });
     }
 }
-
-// Запускаємо плеєр
-initPlayer();
-
-
-    // Радіо
-    const r = document.getElementById('radio-player');
-    const btn = document.getElementById('playRadio');
-    btn.onclick = () => {
-        if (r.paused) { r.play(); btn.textContent = "STOP"; }
-        else { r.pause(); btn.textContent = "PLAY"; }
-    };
-}
-
-// --- ЗАПУСК ---
-document.addEventListener('DOMContentLoaded', () => {
-    initPlayers();
-    updateClock();
-    setInterval(updateClock, 1000);
-    fetchCurrency();
-    fetchNews();
-    setInterval(fetchNews, 300000); // 5 хв
-    updateWeather("Balta");
-
-    // Бургер
-    document.getElementById('menuBtn').onclick = () => document.getElementById('sideMenu').classList.toggle('active');
-    
-    // Анекдот
-    document.getElementById('jokeBtn').onclick = (e) => {
-        e.preventDefault();
-        const j = jokes[Math.floor(Math.random() * jokes.length)];
-        document.getElementById('joke-display').innerHTML = `<p style="padding:10px; border-left:3px solid red;">${j}</p>`;
-    };
-
-    // Місто
-    document.getElementById('city-select').onchange = (e) => updateWeather(e.target.value);
-});
+loadNews();
+setInterval(loadNews, 1000*60*5);
