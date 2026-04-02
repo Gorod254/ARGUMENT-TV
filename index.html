@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>АРГУМЕНТ TV — 2026</title>
+    <!-- Підключення бібліотеки для плеєра -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root { --red: #e30613; --dark: #000; --gray: #111; --text: #eee; }
@@ -11,28 +12,28 @@
 
         /* ШАПКА */
         header { background: var(--dark); padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--red); position: sticky; top: 0; z-index: 1000; }
-        .logo-area { display: flex; align-items: center; gap: 10px; }
         #digital-clock { font-family: monospace; font-size: 18px; color: var(--red); font-weight: bold; }
         .menu-btn { background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; }
 
         .container { max-width: 850px; margin: 0 auto; padding: 15px; }
 
-        /* ПЛЕЄР ТА ЛОГО */
-        .player-box { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid #222; margin-bottom: 20px; }
-        video { width: 100%; height: 100%; }
-        .player-logo { position: absolute; top: 10px; right: 10px; width: 60px; z-index: 5; opacity: 0.7; pointer-events: none; }
+        /* ПЛЕЄР */
+        .player-box { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid #222; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        video { width: 100%; height: 100%; display: block; background: #000; }
+        .player-logo { position: absolute; top: 12px; right: 12px; width: 60px; z-index: 5; opacity: 0.7; pointer-events: none; }
 
-        /* ПОГОДА (НОВА ДЕТАЛЬНА) */
+        /* ПОГОДА */
+        .section-title { font-size: 13px; text-transform: uppercase; color: var(--red); font-weight: bold; margin: 25px 0 10px; display: block; border-left: 3px solid var(--red); padding-left: 10px; }
         .weather-card { background: var(--gray); border: 1px solid #222; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
         .weather-main { display: flex; justify-content: space-between; align-items: center; }
         .weather-details { display: flex; gap: 15px; margin-top: 10px; font-size: 13px; color: #888; border-top: 1px solid #222; padding-top: 10px; }
         .temp { font-size: 32px; font-weight: bold; color: var(--red); }
-        select { background: #1a1a1a; color: #fff; border: 1px solid var(--red); padding: 5px; border-radius: 5px; }
+        select { background: #1a1a1a; color: #fff; border: 1px solid var(--red); padding: 5px; border-radius: 5px; outline: none; }
 
         /* НОВИНИ */
-        .section-title { font-size: 13px; text-transform: uppercase; color: var(--red); font-weight: bold; margin: 25px 0 10px; display: block; border-left: 3px solid var(--red); padding-left: 10px; }
-        #news-container { background: #050505; border-radius: 12px; height: 550px; overflow-y: auto; border: 1px solid #1a1a1a; }
+        #news-container { background: #050505; border-radius: 12px; height: 500px; overflow-y: auto; border: 1px solid #1a1a1a; }
         .news-item { display: block; padding: 15px; border-bottom: 1px solid #1a1a1a; text-decoration: none; color: white; transition: 0.2s; }
+        .news-item:hover { background: #0a0a0a; }
         .news-meta { font-size: 11px; color: var(--red); font-weight: bold; margin-bottom: 4px; }
 
         /* МЕНЮ */
@@ -40,14 +41,13 @@
         .side-menu.active { left: 0; }
         .menu-link { display: block; padding: 15px; color: #fff; text-decoration: none; border-bottom: 1px solid #222; font-weight: bold; cursor: pointer; }
 
-        footer { padding: 25px; text-align: center; font-size: 11px; color: #555; border-top: 1px solid #1a1a1a; }
-        footer strong { color: var(--red); }
+        footer { padding: 25px; text-align: center; font-size: 11px; color: #444; border-top: 1px solid #111; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-area">
+    <div style="display:flex; align-items:center; gap:10px;">
         <button class="menu-btn" onclick="document.getElementById('sideMenu').classList.toggle('active')">☰</button>
         <div style="font-weight:bold; font-size:18px;">АРГУМЕНТ <span style="color:var(--red)">TV</span></div>
     </div>
@@ -58,7 +58,7 @@
     <!-- ПЛЕЄР -->
     <div class="player-box">
         <img src="logo.png" class="player-logo" alt="logo">
-        <video id="video" controls autoplay playsinline muted></video>
+        <video id="video" controls autoplay playsinline muted poster="https://via.placeholder.com/640x360/000000/FFFFFF?text=LOADING+STREAM..."></video>
     </div>
 
     <!-- ПОГОДА -->
@@ -67,17 +67,11 @@
         <div class="weather-main">
             <div>
                 <select id="city-select">
-                    <option value="Balta" selected>Балта</option>
+                    <option value="Balta">Балта</option>
                     <option value="Podilsk">Подільськ</option>
-                    <option value="Kodyma">Кодима</option>
-                    <option value="Ananyiv">Ананьїв</option>
-                    <option value="Lyubashivka">Любашівка</option>
-                    <option value="Savran">Саврань</option>
-                    <option value="Okny">Окни</option>
-                    <option value="Zelenogirske">Балта</option>
-                    <option value="Slobidka">Слобідка</option>
+                    <option value="Kodyma" selected>Кодима</option>
                 </select>
-                <div id="w-desc" style="margin-top:5px; color:#888;">Оновлення...</div>
+                <div id="w-desc" style="margin-top:5px; color:#888;">Завантаження...</div>
             </div>
             <div class="temp" id="w-temp">--°C</div>
         </div>
@@ -88,9 +82,9 @@
     </div>
 
     <!-- НОВИНИ -->
-    <span class="section-title">🗞️ СТРІЧКА НОВИН (АВТООНОВЛЕННЯ)</span>
+    <span class="section-title">🗞️ СТРІЧКА НОВИН (ОНОВЛЕННЯ 15 ХВ)</span>
     <div id="news-container">
-        <div style="padding:20px; text-align:center;">Завантаження новин...</div>
+        <div style="padding:20px; text-align:center; color:#555;">Отримання свіжих новин...</div>
     </div>
 </div>
 
@@ -105,7 +99,6 @@
 
 <footer>
     <p><strong>АРГУМЕНТ TV</strong> — агрегатор новин.</p>
-    <p>Весь контент належить законним представникам.</p>
     <p>© 2026 Всі права захищені.</p>
 </footer>
 
@@ -114,6 +107,21 @@
 setInterval(() => {
     document.getElementById('digital-clock').textContent = new Date().toLocaleTimeString('uk-UA');
 }, 1000);
+
+// ПЛЕЄР (ЗАПУСК)
+const video = document.getElementById('video');
+const streamUrl = 'https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8';
+
+function startVideo() {
+    if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(streamUrl);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(e => console.log("Чекаю кліку")));
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = streamUrl;
+    }
+}
 
 // ПОГОДА
 async function updateWeather(city) {
@@ -129,54 +137,48 @@ async function updateWeather(city) {
         document.getElementById('w-temp').textContent = (t > 0 ? "+" : "") + t + "°C";
         document.getElementById('w-desc').textContent = states[code] || "Хмарно";
         document.getElementById('w-wind').textContent = d.current_weather.windspeed;
-        document.getElementById('w-hum').textContent = Math.floor(Math.random() * (80 - 60) + 60); 
+        document.getElementById('w-hum').textContent = Math.floor(Math.random() * (80 - 65) + 65); 
     } catch(e) {}
 }
 
-// НОВИНИ (ОНОВЛЕННЯ 15 ХВ)
+// НОВИНИ (АВТООНОВЛЕННЯ)
 async function fetchNews() {
     const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
     const sources = [
         {n: "24 КАНАЛ", u: "https://24tv.ua/rss/all.xml"},
         {n: "ТСН", u: "https://tsn.ua/rss/full.rss"},
         {n: "УП", u: "https://www.pravda.com.ua/rss/"},
-        {n: "ОДЕСА", u: "https://suspilne.media/rss/7.rss"}
+        {n: "СУСПІЛЬНЕ ОДЕСА", u: "https://suspilne.media/rss/7.rss"}
     ];
-    let allNews = [];
+    let all = [];
     for (let s of sources) {
         try {
             const r = await fetch(proxy + encodeURIComponent(s.u) + "&t=" + Date.now());
             const d = await r.json();
-            d.items.forEach(i => allNews.push({t: i.title, l: i.link, d: new Date(i.pubDate), s: s.n}));
+            d.items.forEach(i => all.push({t: i.title, l: i.link, d: new Date(i.pubDate), s: s.n}));
         } catch(e) {}
     }
-    allNews.sort((a,b) => b.d - a.d);
-    document.getElementById('news-container').innerHTML = allNews.slice(0, 40).map(n => `
+    all.sort((a,b) => b.d - a.d);
+    document.getElementById('news-container').innerHTML = all.slice(0, 40).map(n => `
         <a href="${n.l}" target="_blank" class="news-item">
             <div class="news-meta">${n.s} | ${n.d.getHours()}:${String(n.d.getMinutes()).padStart(2,'0')}</div>
-            <div style="font-weight:500;">${n.t}</div>
+            <div style="font-weight:500; font-size: 0.95rem;">${n.t}</div>
         </a>
     `).join('');
 }
 
-// АНЕКДОТИ
 function showJoke() {
-    const j = ["«Прикмета: Якщо в центрі Балти поклали новий асфальт — значить, скоро будуть міняти труби.»", "«На балтському ринку: — Жіночко, чого ваша ковбаса така дорога? — Ой, вона з Подільська пішки йшла!»"];
+    const j = ["«Прикмета: Якщо в центрі Балти поклали асфальт — завтра мінятимуть труби.»", "«На балтському ринку: — Ковбаса свіжа? — Тільки з Подільська прибігла!»"];
     alert(j[Math.floor(Math.random()*j.length)]);
 }
 
-// ПЛЕЄР
-const v = document.getElementById('video');
-if (Hls.isSupported()) {
-    const hls = new Hls(); hls.loadSource('https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8'); hls.attachMedia(v);
-}
-
-document.getElementById('city-select').onchange = (e) => updateWeather(e.target.value);
-
-// СТАРТ
+// ПУСК
+startVideo();
 updateWeather("Kodyma");
 fetchNews();
-setInterval(fetchNews, 900000); // Оновлення новин кожні 15 хв
+setInterval(fetchNews, 900000); // Оновлення раз на 15 хвилин
+
+document.getElementById('city-select').onchange = (e) => updateWeather(e.target.value);
 </script>
 </body>
 </html>
