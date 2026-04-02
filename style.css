@@ -1,199 +1,25 @@
-:root {
-    --bg-color: #000000;
-    --text-color: #ffffff;
-    --accent-color: #e30613; /* Червоний як у лого */
-    --gray-color: #1a1a1a;
+body{
+    margin:0;
+    background:black;
+    color:white;
+    font-family:Arial, sans-serif;
 }
-
-body {
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: 'Oswald', sans-serif;
-    padding-bottom: 50px; /* Місце під футер */
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px;}
+.burger{font-size:28px;cursor:pointer;}
+.logo{font-size:28px;font-weight:bold;}
+.logo span{color:red;}
+.clock{font-size:22px;}
+.sideMenu{
+    position:fixed;top:0;left:-300px;width:300px;height:100%;
+    background:#111;padding:20px;transition:0.3s;
 }
-
-/* Шапка */
-.main-header {
-    background: var(--bg-color);
-    padding: 10px 15px;
-    border-bottom: 2px solid var(--accent-color);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.main-logo {
-    height: 40px;
-    object-fit: contain;
-}
-
-.clock {
-    font-size: 1.2rem;
-    color: var(--text-color);
-}
-
-.currency-bar {
-    font-size: 0.8rem;
-    padding-top: 5px;
-    color: #ccc;
-}
-
-/* Меню Бургер */
-.burger-menu {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.burger-menu span {
-    display: block;
-    width: 25px;
-    height: 3px;
-    background: var(--text-color);
-}
-
-/* Відеоплеєр */
-.video-section {
-    position: relative;
-    width: 100%;
-    background: #000;
-}
-
-video {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-}
-
-.live-indicator {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: var(--accent-color);
-    font-weight: bold;
-    text-shadow: 1px 1px 2px #000;
-}
-
-/* Банер тривоги */
-.alert-banner {
-    padding: 15px;
-    text-align: center;
-    font-weight: bold;
-    margin: 10px 0;
-}
-
-.status-red { background-color: var(--accent-color); }
-.status-green { background-color: #28a745; }
-
-.alert-reason {
-    font-size: 0.8rem;
-    font-weight: normal;
-    text-transform: lowercase;
-}
-
-/* Радіо */
-.radio-section {
-    background: var(--gray-color);
-    padding: 15px;
-    text-align: center;
-    border-radius: 8px;
-    margin: 10px;
-}
-
-.radio-btn {
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 10px 30px;
-    font-family: 'Oswald';
-    font-size: 1.2rem;
-    border-radius: 5px;
-}
-
-/* Погода */
-.weather-section {
-    padding: 15px;
-    border-top: 1px solid #333;
-}
-
-#city-select {
-    background: #000;
-    color: #fff;
-    border: 1px solid var(--accent-color);
-    padding: 5px;
-    font-family: 'Oswald';
-}
-
-/* Новини */
-.news-feed { padding: 15px; }
-
-.news-item {
-    border-bottom: 1px solid #222;
-    padding: 12px 0;
-    display: block;
-    text-decoration: none;
-    color: inherit;
-}
-
-.news-source {
-    color: var(--accent-color);
-    font-size: 0.8rem;
-    margin-right: 10px;
-}
-
-.news-time {
-    color: #666;
-    font-size: 0.8rem;
-}
-
-/* Меню (виїзне) */
-.side-menu {
-    position: fixed;
-    top: 0;
-    left: -100%; /* Це сховає його повністю, як би не мінялася ширина */
-    width: 280px;
-    height: 100%;
-    background: #111;
-    transition: 0.3s;
-    z-index: 1000; /* Піднімаємо вище за відео */
-    padding: 20px;
-    box-sizing: border-box; /* Важливо: щоб падінги не розширювали меню */
-}
-
-
-.side-menu.active { left: 0; }
-
-.side-menu ul { list-style: none; padding: 0; }
-
-.side-menu a {
-    color: white;
-    text-decoration: none;
-    display: block;
-    padding: 15px 0;
-    border-bottom: 1px solid #222;
-}
-
-/* Футер */
-.main-footer {
-    font-size: 0.7rem;
-    color: #555;
-    padding: 20px;
-    text-align: center;
-    background: #050505;
-}
-
-/* Адаптація під мобільні */
-@media (max-width: 600px) {
-    .header-top { padding: 5px; }
-    .main-logo { height: 30px; }
-}
+.sideMenu.open{left:0;}
+.menuItem{margin-bottom:20px;}
+.currency{text-align:center;font-size:14px;padding:5px;border-bottom:1px solid red;}
+.videoContainer{padding:10px;}
+video{width:100%;}
+.videoCaption{text-align:center;font-size:12px;}
+.weather{padding:10px;border-top:1px solid red;}
+.newsTicker{white-space:nowrap;overflow-x:auto;border-top:1px solid red;padding:10px;}
+.newsTicker a{margin-right:30px;color:white;text-decoration:none;}
+.footer{text-align:center;font-size:12px;padding:20px;border-top:1px solid red;}
