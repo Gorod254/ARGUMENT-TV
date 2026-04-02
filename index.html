@@ -158,6 +158,10 @@ async function fetchNews() {
         "24 Канал": "https://24tv.ua/rss/all.xml",
         "ТСН": "https://tsn.ua/rss/full.rss",
         "УНІАН": "https://rss.unian.net/site/news_ukr.rss"
+        "УП": "https://www.pravda.com.ua/rss/"
+        "СУСПІЛЬНЕ": "https://suspilne.media/rss/](https://suspilne.media/rss/"
+        "СУСПІЛЬНЕ ОДЕСА": "https://suspilne.media/odesa/rss/"
+        "ГРОМАДСЬКЕ": "https://hromadske.ua/rss"
     };
 
     let allNews = [];
@@ -201,7 +205,7 @@ function init() {
     // Анекдоти
     document.getElementById('jokeBtn').onclick = (e) => {
         e.preventDefault();
-        const j = ["У Балті на ринку: — Чого ковбаса дорога? — Бо з Подільська пішки йшла!", "Тільки в Балті таксист знає кожну ямку по імені."];
+        const j = ["У Балті на ринку: — Чого ковбаса дорога? — Бо з Подільська пішки йшла!","Якщо на балтському ринку тихо - значить сьогодні понеділок!", "Тільки в Балті таксист знає кожну ямку по імені."];
         document.getElementById('joke-display').innerHTML = `<p style="color:var(--red); padding:10px; font-style:italic;">${j[Math.floor(Math.random()*j.length)]}</p>`;
     };
 
