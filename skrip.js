@@ -100,18 +100,53 @@ async function fetchNews() {
     `).join('');
 }
 
-// 5. Плеєри
-function initPlayers() {
-    // Відео
-    const v = document.getElementById('video');
-    const src = 'https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8';
+// 5. НАЛАШТУВАННЯ ПЛЕЄРА (ВИПРАВЛЕНО)
+const v = document.getElementById('video');
+const m3u8Url = 'https://ext.cdn.nashnet.tv/228.0.2.45/index.m3u8';
+
+function initPlayer() {
     if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(src);
+        const hls = new Hls({
+            debug: false,
+            lowLatencyMode: true,
+        });
+        hls.loadSource(m3u8Url);
         hls.attachMedia(v);
-    } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
-        v.src = src;
+        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+            v.play().catch(() => {
+                console.log("Автозапуск заблоковано, очікуємо кліку");
+            });
+        });
+        
+        // Якщо потік обірвався - перепідключаємось
+        hls.on(Hls.Events.ERROR, function (event, data) {
+            if (data.fatal) {
+                switch(data.type) {
+                    case Hls.ErrorTypes.NETWORK_ERROR:
+                        hls.startLoad();
+                        break;
+                    case Hls.ErrorTypes.MEDIA_ERROR:
+                        hls.recoverMediaError();
+                        break;
+                    default:
+                        initPlayer();
+                        break;
+                }
+            }
+        });
+    } 
+    // Для Safari (iPhone/Mac), де HLS підтримується нативно
+    else if (v.canPlayType('application/vnd.apple.mpegurl')) {
+        v.src = m3u8Url;
+        v.addEventListener('loadedmetadata', function() {
+            v.play();
+        });
     }
+}
+
+// Запускаємо плеєр
+initPlayer();
+
 
     // Радіо
     const r = document.getElementById('radio-player');
